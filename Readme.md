@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Роман Пронин](https://up.htmlacademy.ru/ecmascript/20/user/2172705).
-* Наставник: `Неизвестно`.
+* Наставник: [Алексей Хабиров](https://htmlacademy.ru/profile/alex_khab).
 
 ---
 
