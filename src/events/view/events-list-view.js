@@ -1,14 +1,14 @@
 import { createElement } from '../../render.js';
 
-function createEventEditDestinationPhotosContainerTemplate() {
+function createEventsListTemplate() {
   return (
-    '<div class="event__photos-container"></div>'
+    '<ul class="trip-events__list"></ul>'
   );
 }
 
-export default class EventEditDestinationPhotosContainerView {
+export default class EventsListView {
   getTemplate() {
-    return createEventEditDestinationPhotosContainerTemplate();
+    return createEventsListTemplate();
   }
 
   getElement() {
