@@ -1,7 +1,7 @@
-import { createElement } from '../../render.js';
+import { createElement } from '../../../global/render.js';
 
-function createEventsEditOffersTemplate() {
-  return (/*html*/`
+// eslint-disable-next-line no-unused-vars
+const createEventsEditOffersTemplate = (data) => (/*html*/`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
@@ -52,12 +52,15 @@ function createEventsEditOffersTemplate() {
         </div>
       </div>
     </section>`
-  );
-}
+);
 
 export default class EventsEditOffersView {
+  constructor(data) {
+    this.data = data;
+  }
+
   getTemplate() {
-    return createEventsEditOffersTemplate();
+    return createEventsEditOffersTemplate(this.data);
   }
 
   getElement() {

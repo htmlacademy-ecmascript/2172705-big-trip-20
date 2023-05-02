@@ -1,7 +1,6 @@
-import { createElement } from '../../render.js';
+import { createElement } from '../../../global/render.js';
 
-function createTripMainFiltersTemplate() {
-  return (/*html*/`
+const createTripMainFiltersTemplate = () => (/*html*/`
     <form class="trip-filters" action="#" method="get">
       <div class="trip-filters__filter">
         <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
@@ -25,8 +24,7 @@ function createTripMainFiltersTemplate() {
 
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>`
-  );
-}
+);
 
 export default class TripMainFiltersView {
   getTemplate() {

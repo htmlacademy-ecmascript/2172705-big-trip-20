@@ -1,7 +1,7 @@
-import { createElement } from '../../render.js';
+import { createElement } from '../../../global/render.js';
 
-function createEventsEditDestinationTemplate() {
-  return (/*html*/`
+// eslint-disable-next-line no-unused-vars
+const createEventsEditDestinationTemplate = (data) => (/*html*/`
     <section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
@@ -16,12 +16,15 @@ function createEventsEditDestinationTemplate() {
         </div>
       </div>
     </section>`
-  );
-}
+);
 
 export default class EventsEditDestinationView {
+  constructor(data) {
+    this.data = data;
+  }
+
   getTemplate() {
-    return createEventsEditDestinationTemplate();
+    return createEventsEditDestinationTemplate(this.data);
   }
 
   getElement() {
