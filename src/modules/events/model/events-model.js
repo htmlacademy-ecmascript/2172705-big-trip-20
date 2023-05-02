@@ -1,6 +1,6 @@
 import { createDestinationDataset, createEventTypeDataset, createEventDataset } from '../../mock/mock';
 
-const EVENT_COUNT = 3;
+const EVENT_COUNT = 4;
 
 export default class EventsModel {
   destinations = createDestinationDataset();

@@ -32,7 +32,7 @@ const createSelectedOffersTemplate = ({offers, events}, number) => {
   const eventType = events[number].type;
   const eventsOffers = events[number].offers;
 
-  return /*html*/`
+  return `
     ${eventsOffers.length ? `
     <ul class="event__selected-offers">
     ${eventsOffers.map((id) => `

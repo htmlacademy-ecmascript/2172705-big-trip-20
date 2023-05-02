@@ -7,9 +7,9 @@ const createDestinationListTemplate = ({destinations}) =>
     ${destinations.map((destination) => `<option value="${destination.name}"></option>`).join('')}
   </datalist>`;
 
-const createEventsEditItemTemplate = (data) => {
-  const eventsEditOffersView = new EventsEditOffersView(data);
-  const eventsEditDestinationView = new EventsEditDestinationView(data);
+const createEventsEditItemTemplate = (data, number) => {
+  const eventsEditOffersView = new EventsEditOffersView({data, number});
+  const eventsEditDestinationView = new EventsEditDestinationView({data, number});
 
   return (/*html*/`
     <li class="trip-events__item">
@@ -111,12 +111,13 @@ const createEventsEditItemTemplate = (data) => {
 };
 
 export default class EventsEditItemView {
-  constructor({data}) {
+  constructor({data, number}) {
     this.data = data;
+    this.number = number;
   }
 
   getTemplate() {
-    return createEventsEditItemTemplate(this.data);
+    return createEventsEditItemTemplate(this.data, this.number);
   }
 
   getElement() {

@@ -1,30 +1,42 @@
 import { createElement } from '../../../global/render.js';
 
-// eslint-disable-next-line no-unused-vars
-const createEventsEditDestinationTemplate = (data) => (/*html*/`
+const createEventPhotosTemplate = (picturesList) => `
+  <div class="event__photos-container">
+    <div class="event__photos-tape">
+      ${picturesList.length ? `${picturesList.map((picture) => `<img class="event__photo" src="${picture.src}" alt="Event photo">`).join('')}` : ''}
+    </div>
+  </div>`;
+
+const getDestinationInfo = ({destinations, events}, number) => {
+  const {destination: destinationId} = events[number];
+  const destinationItem = destinations.find((item) => item.id === destinationId);
+
+  return {
+    name: destinationItem.name,
+    description: destinationItem.description,
+    pictures: destinationItem.pictures,
+  };
+};
+
+const createEventsEditDestinationTemplate = (data, number) => {
+  const destinationInfo = getDestinationInfo(data, number);
+
+  return (/*html*/`
     <section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
-
-      <div class="event__photos-container">
-        <div class="event__photos-tape">
-          <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-        </div>
-      </div>
-    </section>`
-);
+      <p class="event__destination-description">${destinationInfo.description}</p>
+      ${createEventPhotosTemplate(destinationInfo.pictures)}
+    </section>`);
+};
 
 export default class EventsEditDestinationView {
-  constructor(data) {
+  constructor({data, number}) {
     this.data = data;
+    this.number = number;
   }
 
   getTemplate() {
-    return createEventsEditDestinationTemplate(this.data);
+    return createEventsEditDestinationTemplate(this.data, this.number);
   }
 
   getElement() {

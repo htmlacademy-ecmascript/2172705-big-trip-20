@@ -26,9 +26,9 @@ export default class EventsPresenter {
 
     render(new EventsSortView(), tripEvents);
     render(this.eventsListView, tripEvents);
-    render(new EventsEditItemView({data: this.data}), this.eventsListView.getElement());
+    render(new EventsEditItemView({data: this.data, number: 0}), this.eventsListView.getElement());
 
-    for (let i = 0; i < this.data.events.length; i++) {
+    for (let i = 1; i < this.data.events.length; i++) {
       render(new EventsItemView({data: this.data, number: i}), this.eventsListView.getElement());
     }
   }
