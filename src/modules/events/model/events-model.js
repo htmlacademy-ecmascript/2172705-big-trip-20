@@ -1,4 +1,4 @@
-import { createDestinationDataset, createEventTypeDataset, createEventDataset } from '../../mock/mock';
+import { createDestinationDataset, createEventTypeDataset, createEventDataset } from '../../mock/mock.js';
 
 const EVENT_COUNT = 4;
 
