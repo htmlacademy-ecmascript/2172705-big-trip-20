@@ -15,21 +15,19 @@ export default class EventsPresenter {
   }
 
   init() {
-    this.data = {
-      destinations: this.eventsModel.getDestinations().slice(),
-      offers: this.eventsModel.getOffers().slice(),
-      events: this.eventsModel.getEvents().slice()
-    };
+    this.destinations = this.eventsModel.getDestinations().slice();
+    this.types = this.eventsModel.getTypes().slice();
+    this.events = this.eventsModel.getEvents().slice();
     //! Временно
     // eslint-disable-next-line no-console
-    console.log(this.data);
+    console.log(this.destinations, this.types, this.events);
 
     render(new EventsSortView(), tripEvents);
     render(this.eventsListView, tripEvents);
-    render(new EventsEditItemView({data: this.data, number: 0}), this.eventsListView.getElement());
+    render(new EventsEditItemView({destinations: this.destinations, types: this.types, event: this.events[0]}), this.eventsListView.getElement());
 
-    for (let i = 1; i < this.data.events.length; i++) {
-      render(new EventsItemView({data: this.data, number: i}), this.eventsListView.getElement());
+    for (let i = 1; i < this.events.length; i++) {
+      render(new EventsItemView({destinations: this.destinations, types: this.types, event: this.events[i]}), this.eventsListView.getElement());
     }
   }
 }

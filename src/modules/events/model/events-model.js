@@ -4,15 +4,15 @@ const EVENT_COUNT = 4;
 
 export default class EventsModel {
   destinations = createDestinationDataset();
-  offers = createEventTypeDataset();
-  events = createEventDataset(EVENT_COUNT, this.offers);
+  types = createEventTypeDataset();
+  events = createEventDataset(EVENT_COUNT, this.types);
 
   getDestinations() {
     return this.destinations;
   }
 
-  getOffers() {
-    return this.offers;
+  getTypes() {
+    return this.types;
   }
 
   getEvents() {

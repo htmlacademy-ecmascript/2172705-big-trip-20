@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { getRandomArrayElement, getRandomInteger } from '../../global/utils.js';
 
 const MIN_DEST_DESCR_RANDOM_VALUE = 1;
@@ -12,12 +13,6 @@ const MIN_OFFER_PRICE_VALUE = 200;
 const MAX_OFFER_PRICE_VALUE = 2000;
 const MIN_EVENT_BASE_PRICE = 1000;
 const MAX_EVENT_BASE_PRICE = 5000;
-
-let destinationId = 0;
-let pictureId = 0;
-let eventTypeId = 0;
-let eventTypeOfferId = 0;
-let eventId = 0;
 
 const destinationDescriptions = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget.',
@@ -52,6 +47,7 @@ const eventTypes = [
 ];
 
 //! Пункт назначения
+//! ------------------------------------------------------
 
 const createDestinationDescription = (descriptions) => {
   const descriptionArray = Array.from({ length: getRandomInteger(MIN_DEST_DESCR_RANDOM_VALUE, MAX_DEST_DESCR_RANDOM_VALUE) }, () => getRandomArrayElement(descriptions));
@@ -59,52 +55,46 @@ const createDestinationDescription = (descriptions) => {
   return [...new Set(descriptionArray)].join(' ');
 };
 
-const createPictureData = () => (
+const createPictureData = (id) => (
   {
     src: `https://loremflickr.com/248/152?random=${getRandomInteger(MIN_SRC_PICTURE_RANDOM_VALUE, MAX_SRC_PICTURE_RANDOM_VALUE)}`,
-    description: `Some picture description #${++pictureId}`
+    description: `Some picture description #${id + 1}`
   }
 );
 
-const createPictureDataset = () => Array.from({ length: getRandomInteger(MIN_PICTURE_COUNT, MAX_PICTURE_COUNT) }, createPictureData);
+const createPictureDataset = () => Array.from({ length: getRandomInteger(MIN_PICTURE_COUNT, MAX_PICTURE_COUNT) }, (_, index) => createPictureData(index));
 
-const createDestinationData = () => {
-  pictureId = 0;
+const createDestinationData = (id) => ({
+  id: id + 1,
+  description: createDestinationDescription(destinationDescriptions),
+  name: destinationNames[id],
+  pictures: createPictureDataset()
+});
 
-  return {
-    id: ++destinationId,
-    description: createDestinationDescription(destinationDescriptions),
-    name: destinationNames[destinationId - 1],
-    pictures: createPictureDataset()
-  };
-};
-
-const createDestinationDataset = () => Array.from({ length: destinationNames.length }, createDestinationData);
+const createDestinationDataset = () => Array.from({ length: destinationNames.length }, (_, index) => createDestinationData(index));
 
 //! Опции
+//! ------------------------------------------------------
 
-const createOfferData = () => (
+const createOfferData = (id) => (
   {
-    id: ++eventTypeOfferId,
-    title: `Some offer #${eventTypeOfferId}`,
+    id: id + 1,
+    title: `Some offer #${id + 1}`,
     price: getRandomInteger(MIN_OFFER_PRICE_VALUE, MAX_OFFER_PRICE_VALUE)
   }
 );
 
-const createOfferDataset = () => Array.from({ length: getRandomInteger(MIN_OFFER_COUNT, MAX_OFFER_COUNT) }, createOfferData);
+const createOfferDataset = () => Array.from({ length: getRandomInteger(MIN_OFFER_COUNT, MAX_OFFER_COUNT) }, (_, index) => createOfferData(index));
 
-const createEventTypeData = () => {
-  eventTypeOfferId = 0;
+const createEventTypeData = (id) => ({
+  type: eventTypes[id],
+  offers: createOfferDataset()
+});
 
-  return {
-    type: eventTypes[eventTypeId++],
-    offers: createOfferDataset()
-  };
-};
-
-const createEventTypeDataset = () => Array.from({ length: eventTypes.length }, createEventTypeData);
+const createEventTypeDataset = () => Array.from({ length: eventTypes.length }, (_, index) => createEventTypeData(index));
 
 //! Точки назначения
+//! ------------------------------------------------------
 
 const getOfferCount = (type, eventTypeDataset) => eventTypeDataset[eventTypes.findIndex((eventType) => eventType === type)].offers.length;
 
@@ -115,16 +105,22 @@ const createSelectedOffersDataset = (type, eventTypeDataset) => {
   return [...new Set(offerIdArray)];
 };
 
-const getRandomFormattedNumber = (min, max) => String(getRandomInteger(min, max)).padStart(2, '0');
+const getRandomDate = (isDateFrom) => {
+  if (isDateFrom) {
+    return dayjs().subtract(getRandomInteger(1, 5), 'd').subtract(getRandomInteger(1, 23), 'h').subtract(getRandomInteger(1, 59), 'm').subtract(getRandomInteger(1, 59), 's');
+  }
 
-const createEventData = (eventTypeDataset) => {
+  return dayjs().add(getRandomInteger(1, 5), 'd').add(getRandomInteger(1, 23), 'h').add(getRandomInteger(1, 59), 'm').add(getRandomInteger(1, 59), 's');
+};
+
+const createEventData = (id, eventTypeDataset) => {
   const type = getRandomArrayElement(eventTypes);
 
   return {
-    id: ++eventId,
+    id: id + 1,
     basePrice: getRandomInteger(MIN_EVENT_BASE_PRICE, MAX_EVENT_BASE_PRICE),
-    dateFrom: `2019-07-${getRandomFormattedNumber(1, 14)}T${getRandomFormattedNumber(0, 23)}:${getRandomFormattedNumber(0, 59)}:${getRandomFormattedNumber(0, 59)}.845Z`,
-    dateTo: `2019-07-${getRandomFormattedNumber(15, 30)}T${getRandomFormattedNumber(0, 23)}:${getRandomFormattedNumber(0, 59)}:${getRandomFormattedNumber(0, 59)}.375Z`,
+    dateFrom: getRandomDate(true),
+    dateTo: getRandomDate(false),
     destination: getRandomInteger(1, destinationNames.length),
     isFavorite: Boolean(getRandomInteger(0, 1)),
     offers: createSelectedOffersDataset(type, eventTypeDataset),
@@ -132,6 +128,6 @@ const createEventData = (eventTypeDataset) => {
   };
 };
 
-const createEventDataset = (eventCount, eventTypeDataset) => Array.from({ length: eventCount }, () => createEventData(eventTypeDataset));
+const createEventDataset = (eventCount, eventTypeDataset) => Array.from({ length: eventCount }, (_, index) => createEventData(index, eventTypeDataset));
 
 export { createDestinationDataset, createEventTypeDataset, createEventDataset };
