@@ -1,12 +1,11 @@
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import duration from 'dayjs/plugin/duration';
 
-dayjs.extend(customParseFormat);
 dayjs.extend(duration);
 
-const Format = {
+const DatetimeFormat = {
   EVENT_DATE: 'MMM D',
+  EVENT_EDIT_DATE: 'DD/MM/YY HH:mm',
   TIME: 'HH:mm',
   D_H_M_DURATION: 'DD[D] HH[H] mm[M]',
   H_M_DURATION: 'HH[H] mm[M]',
@@ -21,12 +20,13 @@ const getDuration = (start, end) => {
   const durationValue = dayjs.duration(endDatetime.diff(startDatetime));
 
   if (durationValue.get('day')) {
-    return durationValue.format(Format.D_H_M_DURATION);
-  } else if (!durationValue.get('day') && durationValue.get('hour')) {
-    return durationValue.format(Format.H_M_DURATION);
+    return durationValue.format(DatetimeFormat.D_H_M_DURATION);
+  }
+  if (!durationValue.get('day') && durationValue.get('hour')) {
+    return durationValue.format(DatetimeFormat.H_M_DURATION);
   }
 
-  return durationValue.format(Format.M_DURATION);
+  return durationValue.format(DatetimeFormat.M_DURATION);
 };
 
-export { Format, convertDatetime, getDuration };
+export { DatetimeFormat, convertDatetime, getDuration };
