@@ -1,6 +1,6 @@
-import { createElement } from '../../../global/render.js';
-import { capitalizeWord } from '../../../global/utils.js';
-import { DatetimeFormat, convertDatetime, getDuration } from '../../../global/date.js';
+import { createElement } from '../../../framework/render.js';
+import { capitalizeWord } from '../../../global/utils/common.js';
+import { DatetimeFormat, convertDatetime, getDuration } from '../../../global/utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 

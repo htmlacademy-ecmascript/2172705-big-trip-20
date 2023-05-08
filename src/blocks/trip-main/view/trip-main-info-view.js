@@ -1,4 +1,4 @@
-import { createElement } from '../../../global/render.js';
+import { createElement } from '../../../framework/render.js';
 
 const createTripMainInfoTemplate = () => (/*html*/`
     <section class="trip-main__trip-info  trip-info">

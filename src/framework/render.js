@@ -27,15 +27,16 @@ function createElement(template) {
  * @param {string} place Позиция компонента относительно контейнера. По умолчанию - `beforeend`
  */
 function render(component, container, place = RenderPosition.BEFOREEND) {
-  if (!(component instanceof AbstractView)) {
-    throw new Error('Can render only components');
-  }
+  // if (!(component instanceof AbstractView)) {
+  //   throw new Error('Can render only components');
+  // }
 
   if (container === null) {
     throw new Error('Container element doesn\'t exist');
   }
 
-  container.insertAdjacentElement(place, component.element);
+  container.insertAdjacentElement(place, component.getElement());
+  // container.insertAdjacentElement(place, component.element);
 }
 
 /**

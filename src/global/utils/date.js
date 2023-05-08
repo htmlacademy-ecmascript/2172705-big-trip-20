@@ -1,3 +1,5 @@
+import { getRandomInteger } from '../utils/common.js';
+
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
@@ -29,4 +31,12 @@ const getDuration = (start, end) => {
   return durationValue.format(DatetimeFormat.M_DURATION);
 };
 
-export { DatetimeFormat, convertDatetime, getDuration };
+const getRandomDate = (isDateFrom) => {
+  if (isDateFrom) {
+    return dayjs().subtract(getRandomInteger(1, 5), 'd').subtract(getRandomInteger(1, 23), 'h').subtract(getRandomInteger(1, 59), 'm').subtract(getRandomInteger(1, 59), 's');
+  }
+
+  return dayjs().add(getRandomInteger(1, 5), 'd').add(getRandomInteger(1, 23), 'h').add(getRandomInteger(1, 59), 'm').add(getRandomInteger(1, 59), 's');
+};
+
+export { DatetimeFormat, convertDatetime, getDuration, getRandomDate };

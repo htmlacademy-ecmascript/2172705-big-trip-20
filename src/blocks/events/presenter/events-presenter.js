@@ -1,4 +1,4 @@
-import { render } from '../../../global/render.js';
+import { render } from '../../../framework/render.js';
 
 import EventsSortView from '../view/events-sort-view.js';
 import EventsListView from '../view/events-list-view.js';

@@ -1,4 +1,4 @@
-import { createElement } from '../../../global/render.js';
+import { createElement } from '../../../framework/render.js';
 
 const createTripMainFiltersTemplate = () => (/*html*/`
     <form class="trip-filters" action="#" method="get">
