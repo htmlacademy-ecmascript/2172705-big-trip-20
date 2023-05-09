@@ -34,8 +34,8 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
     <div class="event__available-offers">
       ${offersList.map((offer) => (/*html*/`
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-1" type="checkbox" name="event-offer-${offer.title}" ${isOfferSelected(offer.id, eventSelectedOffers)}>
-          <label class="event__offer-label" for="event-offer-${offer.title}-1">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-${offer.id}" type="checkbox" name="event-offer-${offer.title}" ${isOfferSelected(offer.id, eventSelectedOffers)}>
+          <label class="event__offer-label" for="event-offer-${offer.title}-${offer.id}">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${offer.price}</span>
@@ -137,16 +137,16 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
   );
 };
 
-export default class EventsEditItemView extends AbstractView{
-  #allData = {};
+export default class EventsEditItemView extends AbstractView {
+  #data = {};
 
-  constructor({data, onEditFormSubmit}) {
+  constructor({ data: { destinations, types, event }, onEditFormSubmit }) {
     super();
-    this.#allData = data;
+    this.#data = { destinations, types, event };
     this.element.querySelector('.event--edit').addEventListener('submit', onEditFormSubmit);
   }
 
   get template() {
-    return createEventsEditItemTemplate(this.#allData);
+    return createEventsEditItemTemplate(this.#data);
   }
 }
