@@ -1,6 +1,6 @@
-import { createElement } from '../../../global/render.js';
-import { capitalizeWord } from '../../../global/utils.js';
-import { DatetimeFormat, convertDatetime, getDuration } from '../../../global/date.js';
+import AbstractView from '../../../framework/view/abstract-view.js';
+import { capitalizeWord } from '../../../global/utils/common.js';
+import { DatetimeFormat, convertDatetime, getDuration } from '../../../global/utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -63,24 +63,16 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
     </li>`);
 };
 
-export default class EventsItemView {
-  constructor({ destinations, types, event }) {
-    this.data = { destinations, types, event };
+export default class EventsItemView extends AbstractView {
+  #data = {};
+
+  constructor({ data: { destinations, types, event }, onRollupButtonClick }) {
+    super();
+    this.#data = { destinations, types, event };
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
   }
 
-  getTemplate() {
-    return createEventsItemTemplate(this.data);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEventsItemTemplate(this.#data);
   }
 }

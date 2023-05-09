@@ -1,6 +1,6 @@
-import { createElement } from '../../../global/render.js';
-import { capitalizeWord } from '../../../global/utils.js';
-import { DatetimeFormat, convertDatetime } from '../../../global/date.js';
+import AbstractView from '../../../framework/view/abstract-view.js';
+import { capitalizeWord } from '../../../global/utils/common.js';
+import { DatetimeFormat, convertDatetime } from '../../../global/utils/date.js';
 
 //! Шаблон разметки пункта назначения
 //! ------------------------------------------------------
@@ -34,8 +34,8 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
     <div class="event__available-offers">
       ${offersList.map((offer) => (/*html*/`
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isOfferSelected(offer.id, eventSelectedOffers)}>
-          <label class="event__offer-label" for="event-offer-luggage-1">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-${offer.id}" type="checkbox" name="event-offer-${offer.title}" ${isOfferSelected(offer.id, eventSelectedOffers)}>
+          <label class="event__offer-label" for="event-offer-${offer.title}-${offer.id}">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${offer.price}</span>
@@ -137,24 +137,16 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
   );
 };
 
-export default class EventsEditItemView {
-  constructor({ destinations, types, event }) {
-    this.data = { destinations, types, event };
+export default class EventsEditItemView extends AbstractView {
+  #data = {};
+
+  constructor({ data: { destinations, types, event }, onEditFormSubmit }) {
+    super();
+    this.#data = { destinations, types, event };
+    this.element.querySelector('.event--edit').addEventListener('submit', onEditFormSubmit);
   }
 
-  getTemplate() {
-    return createEventsEditItemTemplate(this.data);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEventsEditItemTemplate(this.#data);
   }
 }
