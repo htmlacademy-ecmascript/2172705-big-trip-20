@@ -1,4 +1,4 @@
-import { createElement } from '../../../framework/render.js';
+import AbstractView from '../../../framework/view/abstract-view.js';
 import { capitalizeWord } from '../../../global/utils/common.js';
 import { DatetimeFormat, convertDatetime } from '../../../global/utils/date.js';
 
@@ -137,24 +137,16 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
   );
 };
 
-export default class EventsEditItemView {
-  constructor({ destinations, types, event }) {
-    this.data = { destinations, types, event };
+export default class EventsEditItemView extends AbstractView{
+  #allData = {};
+
+  constructor({data, onEditFormSubmit}) {
+    super();
+    this.#allData = data;
+    this.element.querySelector('.event--edit').addEventListener('submit', onEditFormSubmit);
   }
 
-  getTemplate() {
-    return createEventsEditItemTemplate(this.data);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEventsEditItemTemplate(this.#allData);
   }
 }

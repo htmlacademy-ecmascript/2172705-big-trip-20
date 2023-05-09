@@ -1,4 +1,4 @@
-import { createElement } from '../../../framework/render.js';
+import AbstractView from '../../../framework/view/abstract-view.js';
 import { capitalizeWord } from '../../../global/utils/common.js';
 import { DatetimeFormat, convertDatetime, getDuration } from '../../../global/utils/date.js';
 
@@ -63,24 +63,16 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
     </li>`);
 };
 
-export default class EventsItemView {
-  constructor({ destinations, types, event }) {
-    this.data = { destinations, types, event };
+export default class EventsItemView extends AbstractView {
+  #allData = {};
+
+  constructor({ data, onRollupButtonClick }) {
+    super();
+    this.#allData = data;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
   }
 
-  getTemplate() {
-    return createEventsItemTemplate(this.data);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEventsItemTemplate(this.#allData);
   }
 }
