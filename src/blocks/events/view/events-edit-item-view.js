@@ -34,8 +34,8 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
     <div class="event__available-offers">
       ${offersList.map((offer) => (/*html*/`
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${isOfferSelected(offer.id, eventSelectedOffers)}>
-          <label class="event__offer-label" for="event-offer-luggage-1">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-1" type="checkbox" name="event-offer-${offer.title}" ${isOfferSelected(offer.id, eventSelectedOffers)}>
+          <label class="event__offer-label" for="event-offer-${offer.title}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${offer.price}</span>

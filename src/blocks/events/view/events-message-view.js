@@ -5,7 +5,7 @@ const createEventsMessageTemplate = (message) => `<p class="trip-events__msg">${
 export default class EventsMessage extends AbstractView {
   #message = null;
 
-  constructor({message}) {
+  constructor({ message }) {
     super();
     this.#message = message;
   }
