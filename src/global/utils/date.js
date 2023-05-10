@@ -7,6 +7,7 @@ dayjs.extend(duration);
 
 const DatetimeFormat = {
   EVENT_DATE: 'MMM D',
+  SHORT_EVENT_DATE: 'D',
   EVENT_EDIT_DATE: 'DD/MM/YY HH:mm',
   TIME: 'HH:mm',
   D_H_M_DURATION: 'DD[D] HH[H] mm[M]',
@@ -39,4 +40,22 @@ const getRandomDate = (isDateFrom) => {
   return dayjs().add(getRandomInteger(1, 5), 'd').add(getRandomInteger(1, 23), 'h').add(getRandomInteger(1, 59), 'm').add(getRandomInteger(1, 59), 's');
 };
 
-export { DatetimeFormat, convertDatetime, getDuration, getRandomDate };
+const isDateFuture = (dateFrom) => dayjs().isBefore(dateFrom);
+
+const isDatePast = (dateTo) => dayjs().isAfter(dateTo);
+
+const isDatePresent = (dateFrom, dateTo) => dayjs().isAfter(dateFrom) && dayjs().isBefore(dateTo);
+
+const isSameMonth = (dateFrom, dateTo) => dayjs(dateTo).isSame(dateFrom, 'M');
+
+
+export {
+  DatetimeFormat,
+  convertDatetime,
+  getDuration,
+  getRandomDate,
+  isDateFuture,
+  isDatePast,
+  isDatePresent,
+  isSameMonth
+};

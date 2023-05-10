@@ -10,6 +10,8 @@ import EventsMessage from '../view/events-message-view.js';
 const tripEvents = document.querySelector('.trip-events');
 
 export default class EventsPresenter {
+  #destinationsModel = null;
+  #typesModel = null;
   #eventsModel = null;
   #destinations = [];
   #types = [];
@@ -17,13 +19,15 @@ export default class EventsPresenter {
 
   #eventsListView = new EventsListView();
 
-  constructor({ eventsModel }) {
+  constructor({ destinationsModel, typesModel, eventsModel }) {
+    this.#destinationsModel = destinationsModel;
+    this.#typesModel = typesModel;
     this.#eventsModel = eventsModel;
   }
 
   init() {
-    this.#destinations = this.#eventsModel.destinations.slice();
-    this.#types = this.#eventsModel.types.slice();
+    this.#destinations = this.#destinationsModel.destinations.slice();
+    this.#types = this.#typesModel.types.slice();
     this.#events = this.#eventsModel.events.slice();
 
     //! Временно

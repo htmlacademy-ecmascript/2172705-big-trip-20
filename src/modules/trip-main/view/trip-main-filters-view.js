@@ -1,33 +1,42 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
 
-const createTripMainFiltersTemplate = () => (/*html*/`
-    <form class="trip-filters" action="#" method="get">
-      <div class="trip-filters__filter">
-        <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="everything" checked>
-        <label class="trip-filters__filter-label" for="filter-everything">Everything</label>
-      </div>
+const isFilterDisabled = (count) => !count ? 'disabled' : '';
 
-      <div class="trip-filters__filter">
-        <input id="filter-future" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="future">
-        <label class="trip-filters__filter-label" for="filter-future">Future</label>
-      </div>
+const isFilterSelected = (isSelected) => isSelected ? 'checked' : '';
 
-      <div class="trip-filters__filter">
-        <input id="filter-present" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="present">
-        <label class="trip-filters__filter-label" for="filter-present">Present</label>
-      </div>
+const createTripMainFilterItemTemplate = (filter, isSelected) => (/*html*/`
+  <div class="trip-filters__filter">
+    <input
+    id="filter-${filter.type}"
+    class="trip-filters__filter-input
+    visually-hidden"
+    type="radio"
+    name="trip-filter"
+    value="${filter.type}"
+    ${isFilterSelected(isSelected)}
+    ${isFilterDisabled(filter.count)}>
 
-      <div class="trip-filters__filter">
-        <input id="filter-past" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="past">
-        <label class="trip-filters__filter-label" for="filter-past">Past</label>
-      </div>
+    <label
+    class="trip-filters__filter-label"
+    for="filter-${filter.type}">
+    ${filter.type}
+    </label>
+  </div>`);
 
-      <button class="visually-hidden" type="submit">Accept filter</button>
-    </form>`
-);
+const createTripMainFiltersTemplate = (filters) => (/*html*/`
+  <form class="trip-filters" action="#" method="get">
+    ${filters.map((filter, index) => createTripMainFilterItemTemplate(filter, index === 0)).join('')}
+  </form>`);
 
 export default class TripMainFiltersView extends AbstractView {
+  #filters = [];
+
+  constructor({ filters }) {
+    super();
+    this.#filters = filters;
+  }
+
   get template() {
-    return createTripMainFiltersTemplate();
+    return createTripMainFiltersTemplate(this.#filters);
   }
 }
