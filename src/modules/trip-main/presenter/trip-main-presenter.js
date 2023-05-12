@@ -9,7 +9,7 @@ const tripFiltersContainer = document.querySelector('.trip-controls__filters');
 
 export default class TripMainPresenter {
   #destinationsModel = null;
-  #typesModel = null;
+  #typeOffersModel = null;
   #eventsModel = null;
 
   #destinations = [];
@@ -17,15 +17,15 @@ export default class TripMainPresenter {
   #events = [];
   #generatedFilters = [];
 
-  constructor({ destinationsModel, typesModel, eventsModel }) {
+  constructor({ destinationsModel, typeOffersModel, eventsModel }) {
     this.#destinationsModel = destinationsModel;
-    this.#typesModel = typesModel;
+    this.#typeOffersModel = typeOffersModel;
     this.#eventsModel = eventsModel;
   }
 
   init() {
     this.#destinations = this.#destinationsModel.destinations.slice();
-    this.#types = this.#typesModel.types.slice();
+    this.#types = this.#typeOffersModel.types.slice();
     this.#events = this.#eventsModel.events.slice();
     this.#generatedFilters = generateFilters(this.#events);
 

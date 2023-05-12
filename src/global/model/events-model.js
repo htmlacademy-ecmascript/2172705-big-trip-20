@@ -4,8 +4,8 @@ import { EVENT_COUNT } from '../mock/const.js';
 export default class EventsModel {
   #events = [];
 
-  constructor({ typesModel}) {
-    this.#events = createEventDataset(EVENT_COUNT, typesModel.types);
+  constructor({ typeOffersModel }) {
+    this.#events = createEventDataset(EVENT_COUNT, typeOffersModel.types);
   }
 
   get events() {

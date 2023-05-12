@@ -1,16 +1,40 @@
 import { FilterType } from '../const.js';
 import { isDateFuture, isDatePast, isDatePresent } from './date.js';
 
-const Filter = {
-  [FilterType.EVERYTHING]: (events) => events,
-  [FilterType.FUTURE]: (events) => events.filter((event) => isDateFuture(event.dateFrom)),
-  [FilterType.PAST]: (events) => events.filter((event) => isDatePast(event.dateTo)),
-  [FilterType.PRESENT]: (events) => events.filter((event) => isDatePresent(event.dateFrom, event.dateTo))
+const initFilterTypes = (events) => {
+  const filterTypes = {};
+
+  for (const name of Object.values(FilterType)) {
+    if (name === FilterType.EVERYTHING) {
+      filterTypes[name] = events.length;
+      continue;
+    }
+
+    filterTypes[name] = 0;
+  }
+
+  return filterTypes;
 };
 
-const generateFilters = (events) => Object.entries(Filter).map(([type, filteredEvents]) => ({
-  type,
-  count: filteredEvents(events).length
-}));
+const getFilterType = (event) => {
+  if (isDateFuture(event.dateFrom)) {
+    return FilterType.FUTURE;
+  }
+  if (isDatePast(event.dateTo)) {
+    return FilterType.PAST;
+  }
+  if (isDatePresent(event.dateFrom, event.dateTo)) {
+    return FilterType.PRESENT;
+  }
+};
+
+const generateFilters = (events) => events.reduce((result, event) => {
+  result[getFilterType(event)]++;
+
+  return result;
+},
+{
+  ...initFilterTypes(events)
+});
 
 export { generateFilters };

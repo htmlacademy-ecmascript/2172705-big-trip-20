@@ -1,6 +1,6 @@
 import { createEventTypeDataset } from '../mock/types.js';
 
-export default class TypesModel {
+export default class TypeOffersModel {
   #types = createEventTypeDataset();
 
   get types() {

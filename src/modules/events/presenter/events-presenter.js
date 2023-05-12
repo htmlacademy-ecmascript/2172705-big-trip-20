@@ -11,7 +11,7 @@ const tripEvents = document.querySelector('.trip-events');
 
 export default class EventsPresenter {
   #destinationsModel = null;
-  #typesModel = null;
+  #typeOffersModel = null;
   #eventsModel = null;
   #destinations = [];
   #types = [];
@@ -19,15 +19,15 @@ export default class EventsPresenter {
 
   #eventsListView = new EventsListView();
 
-  constructor({ destinationsModel, typesModel, eventsModel }) {
+  constructor({ destinationsModel, typeOffersModel, eventsModel }) {
     this.#destinationsModel = destinationsModel;
-    this.#typesModel = typesModel;
+    this.#typeOffersModel = typeOffersModel;
     this.#eventsModel = eventsModel;
   }
 
   init() {
     this.#destinations = this.#destinationsModel.destinations.slice();
-    this.#types = this.#typesModel.types.slice();
+    this.#types = this.#typeOffersModel.types.slice();
     this.#events = this.#eventsModel.events.slice();
 
     //! Временно

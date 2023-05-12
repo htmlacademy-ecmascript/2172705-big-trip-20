@@ -7,4 +7,6 @@ const FilterType = {
   PAST: 'past'
 };
 
-export { EMPTY_EVENTS_LIST_MESSAGE, FilterType };
+const MAX_COUNT_FULL_TRIP_DESTINATIONS = 3;
+
+export { EMPTY_EVENTS_LIST_MESSAGE, FilterType, MAX_COUNT_FULL_TRIP_DESTINATIONS };

@@ -1,31 +1,28 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
 
-const isFilterDisabled = (count) => !count ? 'disabled' : '';
-
-const isFilterSelected = (isSelected) => isSelected ? 'checked' : '';
-
-const createTripMainFilterItemTemplate = (filter, isSelected) => (/*html*/`
+const createFiltersItemTemplate = ([type, count], isSelected) => (/*html*/`
   <div class="trip-filters__filter">
     <input
-    id="filter-${filter.type}"
-    class="trip-filters__filter-input
-    visually-hidden"
-    type="radio"
-    name="trip-filter"
-    value="${filter.type}"
-    ${isFilterSelected(isSelected)}
-    ${isFilterDisabled(filter.count)}>
+      id="filter-${type}"
+      class="trip-filters__filter-input
+      visually-hidden"
+      type="radio"
+      name="trip-filter"
+      value="${type}"
+      ${isSelected ? 'checked' : ''}
+      ${count === 0 ? 'disabled' : ''}
+    >
 
     <label
-    class="trip-filters__filter-label"
-    for="filter-${filter.type}">
-    ${filter.type}
+      class="trip-filters__filter-label"
+      for="filter-${type}">
+      ${type}
     </label>
   </div>`);
 
-const createTripMainFiltersTemplate = (filters) => (/*html*/`
+const createFiltersTemplate = (filters) => (/*html*/`
   <form class="trip-filters" action="#" method="get">
-    ${filters.map((filter, index) => createTripMainFilterItemTemplate(filter, index === 0)).join('')}
+    ${Object.entries(filters).map((filter, index) => createFiltersItemTemplate(filter, index === 0)).join('')}
   </form>`);
 
 export default class TripMainFiltersView extends AbstractView {
@@ -37,6 +34,6 @@ export default class TripMainFiltersView extends AbstractView {
   }
 
   get template() {
-    return createTripMainFiltersTemplate(this.#filters);
+    return createFiltersTemplate(this.#filters);
   }
 }
