@@ -70,7 +70,7 @@ export default class EventsPresenter {
       data,
       onRollupButtonClick: () => {
         replaceEditFormToEventsItem();
-        document.addEventListener('keydown', onDocumentEscapeKeydown);
+        document.removeEventListener('keydown', onDocumentEscapeKeydown);
       },
       onEditFormSubmit: (evt) => {
         evt.preventDefault();
