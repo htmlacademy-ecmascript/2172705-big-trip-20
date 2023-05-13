@@ -134,6 +134,9 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           ${createEventsEditOffersTemplate(typeItem, eventSelectedOffers)}
@@ -147,9 +150,10 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
 export default class EventsEditItemView extends AbstractView {
   #data = {};
 
-  constructor({ data: { destinations, types, event }, onEditFormSubmit }) {
+  constructor({ data: { destinations, types, event }, onRollupButtonClick, onEditFormSubmit }) {
     super();
     this.#data = { destinations, types, event };
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
     this.element.querySelector('.event--edit').addEventListener('submit', onEditFormSubmit);
   }
 

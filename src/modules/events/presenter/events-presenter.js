@@ -68,11 +68,15 @@ export default class EventsPresenter {
 
     const eventsEditItem = new EventsEditItemView({
       data,
+      onRollupButtonClick: () => {
+        replaceEditFormToEventsItem();
+        document.addEventListener('keydown', onDocumentEscapeKeydown);
+      },
       onEditFormSubmit: (evt) => {
         evt.preventDefault();
         replaceEditFormToEventsItem();
         document.removeEventListener('keydown', onDocumentEscapeKeydown);
-      }
+      },
     });
 
     render(eventsItem, this.#eventsListView.element);
