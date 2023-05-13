@@ -34,7 +34,14 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
     <div class="event__available-offers">
       ${offersList.map((offer) => (/*html*/`
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-${offer.id}" type="checkbox" name="event-offer-${offer.title}" ${isOfferSelected(offer.id, eventSelectedOffers)}>
+          <input
+          class="event__offer-checkbox
+          visually-hidden"
+          id="event-offer-${offer.title}-${offer.id}"
+          type="checkbox"
+          name="event-offer-${offer.title}"
+          ${isOfferSelected(offer.id, eventSelectedOffers)}>
+
           <label class="event__offer-label" for="event-offer-${offer.title}-${offer.id}">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
@@ -126,7 +133,10 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Cancel</button>
+          <button class="event__reset-btn" type="reset">Delete</button>
+          <button class="event__rollup-btn" type="button">
+            <span class="visually-hidden">Open event</span>
+          </button>
         </header>
         <section class="event__details">
           ${createEventsEditOffersTemplate(typeItem, eventSelectedOffers)}
@@ -140,9 +150,10 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
 export default class EventsEditItemView extends AbstractView {
   #data = {};
 
-  constructor({ data: { destinations, types, event }, onEditFormSubmit }) {
+  constructor({ data: { destinations, types, event }, onRollupButtonClick, onEditFormSubmit }) {
     super();
     this.#data = { destinations, types, event };
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
     this.element.querySelector('.event--edit').addEventListener('submit', onEditFormSubmit);
   }
 

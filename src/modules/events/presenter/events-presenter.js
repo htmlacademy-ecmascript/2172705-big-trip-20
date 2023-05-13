@@ -10,6 +10,8 @@ import EventsMessage from '../view/events-message-view.js';
 const tripEvents = document.querySelector('.trip-events');
 
 export default class EventsPresenter {
+  #destinationsModel = null;
+  #typeOffersModel = null;
   #eventsModel = null;
   #destinations = [];
   #types = [];
@@ -17,13 +19,15 @@ export default class EventsPresenter {
 
   #eventsListView = new EventsListView();
 
-  constructor({ eventsModel }) {
+  constructor({ destinationsModel, typeOffersModel, eventsModel }) {
+    this.#destinationsModel = destinationsModel;
+    this.#typeOffersModel = typeOffersModel;
     this.#eventsModel = eventsModel;
   }
 
   init() {
-    this.#destinations = this.#eventsModel.destinations.slice();
-    this.#types = this.#eventsModel.types.slice();
+    this.#destinations = this.#destinationsModel.destinations.slice();
+    this.#types = this.#typeOffersModel.types.slice();
     this.#events = this.#eventsModel.events.slice();
 
     //! Временно
@@ -64,11 +68,15 @@ export default class EventsPresenter {
 
     const eventsEditItem = new EventsEditItemView({
       data,
+      onRollupButtonClick: () => {
+        replaceEditFormToEventsItem();
+        document.removeEventListener('keydown', onDocumentEscapeKeydown);
+      },
       onEditFormSubmit: (evt) => {
         evt.preventDefault();
         replaceEditFormToEventsItem();
         document.removeEventListener('keydown', onDocumentEscapeKeydown);
-      }
+      },
     });
 
     render(eventsItem, this.#eventsListView.element);
