@@ -33,7 +33,15 @@ export default class TripMainPresenter {
   }
 
   #renderTripMain() {
+    this.#renderTripMainInfo();
+    this.#renderTripMainFilters();
+  }
+
+  #renderTripMainInfo() {
     render(new TripMainInfoView({ destinations: this.#destinations, types: this.#types, events: this.#events }), tripMainContainer, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderTripMainFilters() {
     render(new TripMainFiltersView({ filters: this.#generatedFilters }), tripFiltersContainer);
   }
 }
