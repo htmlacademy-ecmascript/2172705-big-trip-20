@@ -1,6 +1,6 @@
 import { render, replace } from '../../../framework/render.js';
 
-import { EMPTY_EVENTS_LIST_MESSAGE } from '../../../global/const.js';
+import { EMPTY_EVENTS_LIST_MESSAGE } from '../../../const.js';
 import EventsSortView from '../view/events-sort-view.js';
 import EventsListView from '../view/events-list-view.js';
 import EventsItemView from '../view/events-item-view.js';

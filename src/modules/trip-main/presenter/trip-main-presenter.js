@@ -1,5 +1,5 @@
 import { render, RenderPosition } from '../../../framework/render.js';
-import { generateFilters } from '../../../global/utils/filter.js';
+import { generateFilters } from '../../../utils/filter.js';
 
 import TripMainInfoView from '../view/trip-main-info-view.js';
 import TripMainFiltersView from '../view/trip-main-filters-view.js';

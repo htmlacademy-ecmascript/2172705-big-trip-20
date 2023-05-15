@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-import { capitalizeWord } from '../../../global/utils/common.js';
-import { DatetimeFormat, convertDatetime, getDuration } from '../../../global/utils/date.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DatetimeFormat, convertDatetime, getDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 

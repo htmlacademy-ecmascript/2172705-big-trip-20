@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-import { capitalizeWord } from '../../../global/utils/common.js';
-import { DatetimeFormat, convertDatetime } from '../../../global/utils/date.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DatetimeFormat, convertDatetime } from '../../../utils/date.js';
 
 //! Шаблон разметки пункта назначения
 //! ------------------------------------------------------
