@@ -1,5 +1,5 @@
 import { render, RenderPosition } from '../../../framework/render.js';
-import { generateFilters } from '../../../global/utils/filter.js';
+import { generateFilters } from '../../../utils/filter.js';
 
 import TripMainInfoView from '../view/trip-main-info-view.js';
 import TripMainFiltersView from '../view/trip-main-filters-view.js';
@@ -33,7 +33,15 @@ export default class TripMainPresenter {
   }
 
   #renderTripMain() {
+    this.#renderTripMainInfo();
+    this.#renderTripMainFilters();
+  }
+
+  #renderTripMainInfo() {
     render(new TripMainInfoView({ destinations: this.#destinations, types: this.#types, events: this.#events }), tripMainContainer, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderTripMainFilters() {
     render(new TripMainFiltersView({ filters: this.#generatedFilters }), tripFiltersContainer);
   }
 }

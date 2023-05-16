@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-import { DatetimeFormat, convertDatetime, isSameMonth } from '../../../global/utils/date.js';
-import { MAX_COUNT_FULL_TRIP_DESTINATIONS } from '../../../global/const.js';
+import { DatetimeFormat, convertDatetime, isSameMonth } from '../../../utils/date.js';
+import { MAX_COUNT_FULL_TRIP_DESTINATIONS } from '../../../const.js';
 
 //! Определение наименования маршрута
 //! ------------------------------------------------------

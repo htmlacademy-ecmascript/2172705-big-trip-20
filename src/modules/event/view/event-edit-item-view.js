@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-import { capitalizeWord } from '../../../global/utils/common.js';
-import { DatetimeFormat, convertDatetime } from '../../../global/utils/date.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DatetimeFormat, convertDatetime } from '../../../utils/date.js';
 
 //! Шаблон разметки пункта назначения
 //! ------------------------------------------------------
@@ -154,7 +154,7 @@ export default class EventsEditItemView extends AbstractView {
     super();
     this.#data = { destinations, types, event };
     this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
-    this.element.querySelector('.event--edit').addEventListener('submit', onEditFormSubmit);
+    this.element.querySelector('.event--edit').addEventListener('submit', () => onEditFormSubmit(this.#data.event));
   }
 
   get template() {

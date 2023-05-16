@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-import { capitalizeWord } from '../../../global/utils/common.js';
-import { DatetimeFormat, convertDatetime, getDuration } from '../../../global/utils/date.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DatetimeFormat, convertDatetime, getDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -66,10 +66,11 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
 export default class EventsItemView extends AbstractView {
   #data = {};
 
-  constructor({ data: { destinations, types, event }, onRollupButtonClick }) {
+  constructor({ data: { destinations, types, event }, onRollupButtonClick, onFavoriteButtonClick }) {
     super();
     this.#data = { destinations, types, event };
     this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', onFavoriteButtonClick);
   }
 
   get template() {
