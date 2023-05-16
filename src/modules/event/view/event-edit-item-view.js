@@ -154,7 +154,7 @@ export default class EventsEditItemView extends AbstractView {
     super();
     this.#data = { destinations, types, event };
     this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
-    this.element.querySelector('.event--edit').addEventListener('submit', onEditFormSubmit);
+    this.element.querySelector('.event--edit').addEventListener('submit', () => onEditFormSubmit(this.#data.event));
   }
 
   get template() {

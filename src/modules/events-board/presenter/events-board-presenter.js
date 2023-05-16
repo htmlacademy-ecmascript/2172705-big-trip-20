@@ -1,6 +1,7 @@
 import { render } from '../../../framework/render.js';
-
+import { updateItem } from '../../../utils/common.js';
 import { EMPTY_EVENTS_LIST_MESSAGE } from '../../../const.js';
+
 import EventsSortView from '../view/events-board-sort-view.js';
 import EventsListView from '../view/events-board-list-view.js';
 import EventsMessageView from '../view/events-board-message-view.js';
@@ -19,6 +20,7 @@ export default class EventsBoardPresenter {
   #events = [];
 
   #eventsListComponent = new EventsListView();
+  #eventPresenters = new Map();
 
   constructor({ destinationsModel, typeOffersModel, eventsModel }) {
     this.#destinationsModel = destinationsModel;
@@ -50,6 +52,11 @@ export default class EventsBoardPresenter {
     events.forEach((_, i) => this.#renderEventsBoardItem({ destinations, types, event: events[i] }));
   }
 
+  #clearEventsBoard() {
+    this.#eventPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventPresenters.clear();
+  }
+
   #renderEventsBoardMessage(message) {
     render(new EventsMessageView({ message }), tripEvents);
   }
@@ -62,11 +69,29 @@ export default class EventsBoardPresenter {
     render(this.#eventsListComponent, tripEvents);
   }
 
-  #renderEventsBoardItem(data) {
+  #renderEventsBoardItem({ destinations, types, event }) {
     const eventsBoardItemPresenter = new EventPresenter({
-      eventsListContainer: this.#eventsListComponent
+      eventsListContainer: this.#eventsListComponent,
+      rerenderEvent: this.#rerenderEvent,
+      // changeEventMode: this.#changeEventMode
     });
 
-    eventsBoardItemPresenter.init({ data });
+    eventsBoardItemPresenter.init({ destinations, types, event });
+    this.#eventPresenters.set(event.id, eventsBoardItemPresenter);
   }
+
+  #rerenderEvent = (updatedEvent) => {
+    this.#events = updateItem(this.#events, updatedEvent);
+    this.#eventPresenters.get(updatedEvent.id).init({ destinations: this.#destinations, types: this.#types, event: updatedEvent });
+  };
+
+  // #changeEventMode = (mode, eventId) => {
+  //   if (mode === Mode.DEFAULT) {
+  //     this.#eventPresenters.forEach((presenter) => presenter.resetView());
+  //     this.#eventPresenters.get(eventId).updateMode(Mode.EDITING);
+  //   }
+  //   if (mode === Mode.EDITING) {
+  //     this.#eventPresenters.get(eventId).updateMode(Mode.DEFAULT);
+  //   }
+  // };
 }

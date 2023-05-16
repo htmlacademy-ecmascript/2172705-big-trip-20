@@ -66,10 +66,11 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
 export default class EventsItemView extends AbstractView {
   #data = {};
 
-  constructor({ data: { destinations, types, event }, onRollupButtonClick }) {
+  constructor({ data: { destinations, types, event }, onRollupButtonClick, onFavoriteButtonClick }) {
     super();
     this.#data = { destinations, types, event };
     this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', onFavoriteButtonClick);
   }
 
   get template() {
