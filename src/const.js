@@ -9,9 +9,9 @@ const FilterType = {
   PAST: 'past'
 };
 
-// const Mode = {
-//   DEFAULT: 'default',
-//   EDITING: 'editing'
-// };
+const Mode = {
+  DEFAULT: 'default',
+  EDITING: 'editing'
+};
 
-export { EMPTY_EVENTS_LIST_MESSAGE, MAX_COUNT_FULL_TRIP_DESTINATIONS, FilterType };
+export { EMPTY_EVENTS_LIST_MESSAGE, MAX_COUNT_FULL_TRIP_DESTINATIONS, FilterType, Mode };

@@ -1,4 +1,5 @@
 import { render, replace, remove } from '../../../framework/render.js';
+import { Mode } from '../../../const.js';
 
 import EventItemView from '../view/event-item-view.js';
 import EventEditItemView from '../view/event-edit-item-view.js';
@@ -11,14 +12,14 @@ export default class EventPresenter {
   #eventEditItem = null;
 
   #rerenderEvent = null;
-  // #changeEventMode = null;
+  #changeEventMode = null;
 
-  // #mode = Mode.DEFAULT;
+  #mode = Mode.DEFAULT;
 
-  constructor({ eventsListContainer, rerenderEvent }) {
+  constructor({ eventsListContainer, rerenderEvent, changeEventMode }) {
     this.#eventsListContainer = eventsListContainer;
     this.#rerenderEvent = rerenderEvent;
-    // this.#changeEventMode = changeEventMode;
+    this.#changeEventMode = changeEventMode;
   }
 
   init({ destinations, types, event }) {
@@ -71,15 +72,15 @@ export default class EventPresenter {
     remove(this.#eventEditItem);
   }
 
-  // resetView() {
-  //   if (this.#mode !== Mode.DEFAULT) {
-  //     this.#replaceEditFormToEventItem();
-  //   }
-  // }
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceEditFormToEventItem();
+    }
+  }
 
-  // updateMode(mode) {
-  //   this.#mode = mode;
-  // }
+  updateMode(mode) {
+    this.#mode = mode;
+  }
 
   #onDocumentEscapeKeydown = (evt) => {
     if (evt.key === 'Escape') {
@@ -91,13 +92,13 @@ export default class EventPresenter {
 
   #replaceEventItemToEditForm() {
     replace(this.#eventEditItem, this.#eventItem);
-    // this.#changeEventMode(this.#mode, this.#data.event.id);
+    this.#changeEventMode(this.#mode, this.#data.event.id);
     document.addEventListener('keydown', this.#onDocumentEscapeKeydown);
   }
 
   #replaceEditFormToEventItem() {
     replace(this.#eventItem, this.#eventEditItem);
-    // this.#changeEventMode(this.#mode, this.#data.event.id);
+    this.#changeEventMode(this.#mode, this.#data.event.id);
     document.removeEventListener('keydown', this.#onDocumentEscapeKeydown);
   }
 }

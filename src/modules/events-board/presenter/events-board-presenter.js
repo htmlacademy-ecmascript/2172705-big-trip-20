@@ -1,6 +1,6 @@
 import { render } from '../../../framework/render.js';
 import { updateItem } from '../../../utils/common.js';
-import { EMPTY_EVENTS_LIST_MESSAGE } from '../../../const.js';
+import { EMPTY_EVENTS_LIST_MESSAGE, Mode } from '../../../const.js';
 
 import EventsSortView from '../view/events-board-sort-view.js';
 import EventsListView from '../view/events-board-list-view.js';
@@ -73,7 +73,7 @@ export default class EventsBoardPresenter {
     const eventsBoardItemPresenter = new EventPresenter({
       eventsListContainer: this.#eventsListComponent,
       rerenderEvent: this.#rerenderEvent,
-      // changeEventMode: this.#changeEventMode
+      changeEventMode: this.#changeEventMode
     });
 
     eventsBoardItemPresenter.init({ destinations, types, event });
@@ -85,13 +85,13 @@ export default class EventsBoardPresenter {
     this.#eventPresenters.get(updatedEvent.id).init({ destinations: this.#destinations, types: this.#types, event: updatedEvent });
   };
 
-  // #changeEventMode = (mode, eventId) => {
-  //   if (mode === Mode.DEFAULT) {
-  //     this.#eventPresenters.forEach((presenter) => presenter.resetView());
-  //     this.#eventPresenters.get(eventId).updateMode(Mode.EDITING);
-  //   }
-  //   if (mode === Mode.EDITING) {
-  //     this.#eventPresenters.get(eventId).updateMode(Mode.DEFAULT);
-  //   }
-  // };
+  #changeEventMode = (mode, eventId) => {
+    if (mode === Mode.DEFAULT) {
+      this.#eventPresenters.forEach((presenter) => presenter.resetView());
+      this.#eventPresenters.get(eventId).updateMode(Mode.EDITING);
+    }
+    if (mode === Mode.EDITING) {
+      this.#eventPresenters.get(eventId).updateMode(Mode.DEFAULT);
+    }
+  };
 }
