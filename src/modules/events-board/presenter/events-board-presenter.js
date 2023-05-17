@@ -21,8 +21,6 @@ export default class EventsBoardPresenter {
   #types = [];
   #events = [];
 
-  #currentSortType = SortType.DAY;
-
   #eventsBoardSortComponent = null;
   #eventsBoardListComponent = new EventsBoardListView();
   #eventPresenters = new Map();
@@ -67,12 +65,8 @@ export default class EventsBoardPresenter {
   }
 
   #onFiltersChange = () => {
-    this.#sortEvents(SortType.DAY);
-    this.#clearEventsBoard();
-    this.#renderEventsBoardList();
-
-    remove(this.#eventsBoardSortComponent);
-    this.#renderEventsBoardSort();
+    this.#onSortTypeChange(SortType.DAY.name.toUpperCase());
+    this.#rerenderEventsBoardSort();
   };
 
   #renderEventsBoardSort() {
@@ -81,6 +75,11 @@ export default class EventsBoardPresenter {
     });
 
     render(this.#eventsBoardSortComponent, this.#eventsBoardListComponent.element, RenderPosition.BEFOREBEGIN);
+  }
+
+  #rerenderEventsBoardSort() {
+    remove(this.#eventsBoardSortComponent);
+    this.#renderEventsBoardSort();
   }
 
   #renderEventsBoardList() {
@@ -132,8 +131,6 @@ export default class EventsBoardPresenter {
     if (type === SortType.PRICE) {
       this.#events.sort(sortByDesc('basePrice'));
     }
-
-    this.#currentSortType = type;
   }
 
   #clearEventsBoard() {
@@ -142,10 +139,6 @@ export default class EventsBoardPresenter {
   }
 
   #onSortTypeChange = (sortTypeName) => {
-    if (this.#currentSortType === SortType[sortTypeName]) {
-      return;
-    }
-
     this.#sortEvents(SortType[sortTypeName]);
     this.#clearEventsBoard();
     this.#renderEventsBoardList();

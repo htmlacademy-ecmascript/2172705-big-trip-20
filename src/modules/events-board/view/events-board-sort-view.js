@@ -29,7 +29,7 @@ export default class EventsBoardSortView extends AbstractView {
   constructor({ onSortTypeChange }) {
     super();
     this.#onSortTypeChange = onSortTypeChange;
-    this.element.addEventListener('click', this.#sortTypeChangeHandler);
+    this.element.addEventListener('change', this.#sortTypeChangeHandler);
   }
 
   get template() {
