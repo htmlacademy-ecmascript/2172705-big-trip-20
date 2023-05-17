@@ -1,6 +1,7 @@
 import DestinationsModel from './model/destinations-model.js';
 import TypeOffersModel from './model/type-offers-model.js';
 import EventsModel from './model/events-model.js';
+
 import TripMainPresenter from './modules/trip-main/presenter/trip-main-presenter.js';
 import EventsBoardPresenter from './modules/events-board/presenter/events-board-presenter.js';
 

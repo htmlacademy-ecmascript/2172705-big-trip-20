@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
 import { capitalizeWord } from '../../../utils/common.js';
-import { DatetimeFormat, convertDatetime, getDuration } from '../../../utils/date.js';
+import { DatetimeFormat, convertDatetime, getDuration, formatDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -43,7 +43,7 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
             &mdash;
             <time class="event__end-time" datetime="${dateTo}">${convertDatetime(dateTo, DatetimeFormat.TIME)}</time>
           </p>
-          <p class="event__duration">${getDuration(dateFrom, dateTo)}</p>
+          <p class="event__duration">${formatDuration(getDuration(dateFrom, dateTo))}</p>
         </div>
         <p class="event__price">
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
@@ -63,7 +63,7 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
     </li>`);
 };
 
-export default class EventsItemView extends AbstractView {
+export default class EventItemView extends AbstractView {
   #data = {};
 
   constructor({ data: { destinations, types, event }, onRollupButtonClick, onFavoriteButtonClick }) {

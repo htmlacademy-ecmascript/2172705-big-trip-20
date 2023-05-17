@@ -35,13 +35,12 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
       ${offersList.map((offer) => (/*html*/`
         <div class="event__offer-selector">
           <input
-          class="event__offer-checkbox
-          visually-hidden"
-          id="event-offer-${offer.title}-${offer.id}"
-          type="checkbox"
-          name="event-offer-${offer.title}"
-          ${isOfferSelected(offer.id, eventSelectedOffers)}>
-
+            class="event__offer-checkbox visually-hidden"
+            id="event-offer-${offer.title}-${offer.id}"
+            type="checkbox"
+            name="event-offer-${offer.title}"
+            ${isOfferSelected(offer.id, eventSelectedOffers)}
+          >
           <label class="event__offer-label" for="event-offer-${offer.title}-${offer.id}">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
@@ -147,17 +146,25 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
   );
 };
 
-export default class EventsEditItemView extends AbstractView {
+export default class EventEditItemView extends AbstractView {
   #data = {};
+
+  #onEditFormSubmit = null;
 
   constructor({ data: { destinations, types, event }, onRollupButtonClick, onEditFormSubmit }) {
     super();
     this.#data = { destinations, types, event };
+    this.#onEditFormSubmit = onEditFormSubmit;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
-    this.element.querySelector('.event--edit').addEventListener('submit', () => onEditFormSubmit(this.#data.event));
+    this.element.querySelector('.event--edit').addEventListener('submit', this.#editFormSubmitHandler);
   }
 
   get template() {
     return createEventsEditItemTemplate(this.#data);
   }
+
+  #editFormSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#onEditFormSubmit(this.#data.event);
+  };
 }

@@ -1,6 +1,6 @@
 const EMPTY_EVENTS_LIST_MESSAGE = 'Click New Event to create your first point';
 
-const MAX_COUNT_FULL_TRIP_DESTINATIONS = 3;
+const MAX_DISPLAYED_DESTINATIONS = 3;
 
 const FilterType = {
   EVERYTHING: 'everything',
@@ -9,9 +9,32 @@ const FilterType = {
   PAST: 'past'
 };
 
-const Mode = {
+const EventMode = {
   DEFAULT: 'default',
   EDITING: 'editing'
 };
 
-export { EMPTY_EVENTS_LIST_MESSAGE, MAX_COUNT_FULL_TRIP_DESTINATIONS, FilterType, Mode };
+const SortType = {
+  DAY: {
+    name: 'day',
+    isDisabled: false
+  },
+  EVENT: {
+    name: 'event',
+    isDisabled: true
+  },
+  TIME: {
+    name: 'time',
+    isDisabled: false
+  },
+  PRICE: {
+    name: 'price',
+    isDisabled: false
+  },
+  OFFERS: {
+    name: 'OFFERS',
+    isDisabled: true
+  }
+};
+
+export { EMPTY_EVENTS_LIST_MESSAGE, MAX_DISPLAYED_DESTINATIONS, FilterType, EventMode, SortType };

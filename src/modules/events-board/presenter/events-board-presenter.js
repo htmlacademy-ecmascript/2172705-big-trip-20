@@ -1,11 +1,13 @@
-import { render } from '../../../framework/render.js';
-import { updateItem } from '../../../utils/common.js';
-import { EMPTY_EVENTS_LIST_MESSAGE, Mode } from '../../../const.js';
+import { RenderPosition ,render, remove } from '../../../framework/render.js';
+import { updateItem, sortByDesc } from '../../../utils/common.js';
+import { sortByDurationDesc, sortByDateAsc } from '../../../utils/date.js';
+import { EMPTY_EVENTS_LIST_MESSAGE, EventMode, SortType } from '../../../const.js';
 
-import EventsSortView from '../view/events-board-sort-view.js';
-import EventsListView from '../view/events-board-list-view.js';
-import EventsMessageView from '../view/events-board-message-view.js';
+import EventsBoardSortView from '../view/events-board-sort-view.js';
+import EventsBoardListView from '../view/events-board-list-view.js';
+import EventsBoardMessageView from '../view/events-board-message-view.js';
 
+import FiltersPresenter from '../../filters/presenter/filters-presenter.js';
 import EventPresenter from '../../event/presenter/event-presenter.js';
 
 const tripEvents = document.querySelector('.trip-events');
@@ -19,7 +21,10 @@ export default class EventsBoardPresenter {
   #types = [];
   #events = [];
 
-  #eventsListComponent = new EventsListView();
+  #currentSortType = SortType.DAY;
+
+  #eventsBoardSortComponent = null;
+  #eventsBoardListComponent = new EventsBoardListView();
   #eventPresenters = new Map();
 
   constructor({ destinationsModel, typeOffersModel, eventsModel }) {
@@ -33,6 +38,8 @@ export default class EventsBoardPresenter {
     this.#types = this.#typeOffersModel.types.slice();
     this.#events = this.#eventsModel.events.slice();
 
+    this.#sortByDay();
+
     //! Временно
     // eslint-disable-next-line no-console
     console.log(this.#destinations, this.#types, this.#events);
@@ -40,38 +47,50 @@ export default class EventsBoardPresenter {
     this.#renderEventsBoard({ destinations: this.#destinations, types: this.#types, events: this.#events });
   }
 
-  #renderEventsBoard({ destinations, types, events }) {
-    if (!events.length) {
+  #renderEventsBoard() {
+    if (!this.#events.length) {
       this.#renderEventsBoardMessage({ message: EMPTY_EVENTS_LIST_MESSAGE });
       return;
     }
 
+    this.#renderFilters();
+    this.#renderEventsBoardList();
     this.#renderEventsBoardSort();
+  }
+
+  #renderFilters() {
+    const filtersPresenter = new FiltersPresenter({
+      onFiltersChange: this.#onFiltersChange
+    });
+
+    filtersPresenter.init({ events: this.#events });
+  }
+
+  #onFiltersChange = () => {
+    this.#sortEvents(SortType.DAY);
+    this.#clearEventsBoard();
     this.#renderEventsBoardList();
 
-    events.forEach((_, i) => this.#renderEventsBoardItem({ destinations, types, event: events[i] }));
-  }
-
-  #clearEventsBoard() {
-    this.#eventPresenters.forEach((presenter) => presenter.destroy());
-    this.#eventPresenters.clear();
-  }
-
-  #renderEventsBoardMessage(message) {
-    render(new EventsMessageView({ message }), tripEvents);
-  }
+    remove(this.#eventsBoardSortComponent);
+    this.#renderEventsBoardSort();
+  };
 
   #renderEventsBoardSort() {
-    render(new EventsSortView(), tripEvents);
+    this.#eventsBoardSortComponent = new EventsBoardSortView({
+      onSortTypeChange : this.#onSortTypeChange
+    });
+
+    render(this.#eventsBoardSortComponent, this.#eventsBoardListComponent.element, RenderPosition.BEFOREBEGIN);
   }
 
   #renderEventsBoardList() {
-    render(this.#eventsListComponent, tripEvents);
+    render(this.#eventsBoardListComponent, tripEvents);
+    this.#events.forEach((event) => this.#renderEventsBoardItem({ destinations: this.#destinations, types: this.#types, event }));
   }
 
   #renderEventsBoardItem({ destinations, types, event }) {
     const eventsBoardItemPresenter = new EventPresenter({
-      eventsListContainer: this.#eventsListComponent,
+      eventsListContainer: this.#eventsBoardListComponent,
       rerenderEvent: this.#rerenderEvent,
       changeEventMode: this.#changeEventMode
     });
@@ -80,18 +99,55 @@ export default class EventsBoardPresenter {
     this.#eventPresenters.set(event.id, eventsBoardItemPresenter);
   }
 
+  #renderEventsBoardMessage(message) {
+    render(new EventsBoardMessageView({ message }), tripEvents);
+  }
+
   #rerenderEvent = (updatedEvent) => {
     this.#events = updateItem(this.#events, updatedEvent);
     this.#eventPresenters.get(updatedEvent.id).init({ destinations: this.#destinations, types: this.#types, event: updatedEvent });
   };
 
   #changeEventMode = (mode, eventId) => {
-    if (mode === Mode.DEFAULT) {
+    if (mode === EventMode.DEFAULT) {
       this.#eventPresenters.forEach((presenter) => presenter.resetView());
-      this.#eventPresenters.get(eventId).updateMode(Mode.EDITING);
+      this.#eventPresenters.get(eventId).updateMode(EventMode.EDITING);
     }
-    if (mode === Mode.EDITING) {
-      this.#eventPresenters.get(eventId).updateMode(Mode.DEFAULT);
+    if (mode === EventMode.EDITING) {
+      this.#eventPresenters.get(eventId).updateMode(EventMode.DEFAULT);
     }
+  };
+
+  #sortByDay() {
+    this.#events.sort(sortByDateAsc('dateFrom'));
+  }
+
+  #sortEvents(type) {
+    if (type === SortType.DAY) {
+      this.#sortByDay();
+    }
+    if (type === SortType.TIME) {
+      this.#events.sort(sortByDurationDesc);
+    }
+    if (type === SortType.PRICE) {
+      this.#events.sort(sortByDesc('basePrice'));
+    }
+
+    this.#currentSortType = type;
+  }
+
+  #clearEventsBoard() {
+    this.#eventPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventPresenters.clear();
+  }
+
+  #onSortTypeChange = (sortTypeName) => {
+    if (this.#currentSortType === SortType[sortTypeName]) {
+      return;
+    }
+
+    this.#sortEvents(SortType[sortTypeName]);
+    this.#clearEventsBoard();
+    this.#renderEventsBoardList();
   };
 }

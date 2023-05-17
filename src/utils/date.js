@@ -17,11 +17,9 @@ const DatetimeFormat = {
 
 const convertDatetime = (datetime, format) => dayjs(datetime).format(format);
 
-const getDuration = (start, end) => {
-  const startDatetime = dayjs(start);
-  const endDatetime = dayjs(end);
-  const durationValue = dayjs.duration(endDatetime.diff(startDatetime));
+const getDuration = (start, end) => dayjs.duration(dayjs(end).diff(dayjs(start)));
 
+const formatDuration = (durationValue) => {
   if (durationValue.get('day')) {
     return durationValue.format(DatetimeFormat.D_H_M_DURATION);
   }
@@ -31,6 +29,15 @@ const getDuration = (start, end) => {
 
   return durationValue.format(DatetimeFormat.M_DURATION);
 };
+
+const sortByDurationDesc = (first, second) => {
+  const firstItem = getDuration(first.dateFrom, first.dateTo);
+  const secondItem = getDuration(second.dateFrom, second.dateTo);
+
+  return secondItem.asMilliseconds() - firstItem.asMilliseconds();
+};
+
+const sortByDateAsc = (propertyName) => (first, second) => getDuration(second[propertyName], first[propertyName]).asMilliseconds();
 
 const getRandomDate = (isDateFrom) => {
   if (isDateFrom) {
@@ -48,11 +55,13 @@ const isDatePresent = (dateFrom, dateTo) => dayjs().isAfter(dateFrom) && dayjs()
 
 const isSameMonth = (dateFrom, dateTo) => dayjs(dateTo).isSame(dateFrom, 'M');
 
-
 export {
   DatetimeFormat,
   convertDatetime,
   getDuration,
+  formatDuration,
+  sortByDurationDesc,
+  sortByDateAsc,
   getRandomDate,
   isDateFuture,
   isDatePast,
