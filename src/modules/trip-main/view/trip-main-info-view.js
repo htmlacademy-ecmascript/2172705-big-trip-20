@@ -1,6 +1,7 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
+import { sortByAsc } from '../../../utils/common.js';
 import { DatetimeFormat, convertDatetime, isSameMonth } from '../../../utils/date.js';
-import { MAX_COUNT_FULL_TRIP_DESTINATIONS } from '../../../const.js';
+import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
 
 //! Определение наименования маршрута
 //! ------------------------------------------------------
@@ -10,7 +11,7 @@ const getDestinationItem = (destinations, eventItem) => destinations.find((item)
 const getTitle = ({ destinations, events }) => {
   const destinationNamesList = events.map((event) => getDestinationItem(destinations, event).name);
 
-  if (destinationNamesList.length <= MAX_COUNT_FULL_TRIP_DESTINATIONS) {
+  if (destinationNamesList.length <= MAX_DISPLAYED_DESTINATIONS) {
     return destinationNamesList.join('&nbsp;&mdash;&nbsp;');
   }
 
@@ -20,8 +21,6 @@ const getTitle = ({ destinations, events }) => {
 
 //! Определение дат начала и конца путешествия
 //! ------------------------------------------------------
-
-const sortByAsc = (propertyName) => (first, second) => first[propertyName] - second[propertyName];
 
 const getTripDates = ({ events }) => {
   if (!events.length) {

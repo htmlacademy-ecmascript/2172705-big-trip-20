@@ -1,5 +1,5 @@
 import { render, replace, remove } from '../../../framework/render.js';
-import { Mode } from '../../../const.js';
+import { EventMode } from '../../../const.js';
 
 import EventItemView from '../view/event-item-view.js';
 import EventEditItemView from '../view/event-edit-item-view.js';
@@ -14,7 +14,7 @@ export default class EventPresenter {
   #rerenderEvent = null;
   #changeEventMode = null;
 
-  #mode = Mode.DEFAULT;
+  #mode = EventMode.DEFAULT;
 
   constructor({ eventsListContainer, rerenderEvent, changeEventMode }) {
     this.#eventsListContainer = eventsListContainer;
@@ -43,8 +43,7 @@ export default class EventPresenter {
       onRollupButtonClick: () => {
         this.#replaceEditFormToEventItem();
       },
-      onEditFormSubmit: (evt, updatedEvent) => {
-        evt.preventDefault();
+      onEditFormSubmit: (updatedEvent) => {
         this.#replaceEditFormToEventItem();
         this.#rerenderEvent(updatedEvent);
       }
@@ -55,11 +54,11 @@ export default class EventPresenter {
       return;
     }
 
-    if (this.#eventsListContainer.element.contains(prevEventItem.element)) {
+    if (this.#mode === EventMode.DEFAULT) {
       replace(this.#eventItem, prevEventItem);
     }
 
-    if (this.#eventsListContainer.element.contains(prevEventEditItem.element)) {
+    if (this.#mode === EventMode.EDITING) {
       replace(this.#eventEditItem, prevEventEditItem);
     }
 
@@ -73,7 +72,7 @@ export default class EventPresenter {
   }
 
   resetView() {
-    if (this.#mode !== Mode.DEFAULT) {
+    if (this.#mode !== EventMode.DEFAULT) {
       this.#replaceEditFormToEventItem();
     }
   }

@@ -1,7 +1,7 @@
-import { getRandomInteger } from '../utils/common.js';
-
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
+import { getRandomInteger } from '../utils/common.js';
 
 dayjs.extend(duration);
 
@@ -17,11 +17,9 @@ const DatetimeFormat = {
 
 const convertDatetime = (datetime, format) => dayjs(datetime).format(format);
 
-const getDuration = (start, end) => {
-  const startDatetime = dayjs(start);
-  const endDatetime = dayjs(end);
-  const durationValue = dayjs.duration(endDatetime.diff(startDatetime));
+const getDuration = (start, end) => dayjs.duration(dayjs(end).diff(dayjs(start)));
 
+const formatDuration = (durationValue) => {
   if (durationValue.get('day')) {
     return durationValue.format(DatetimeFormat.D_H_M_DURATION);
   }
@@ -31,6 +29,15 @@ const getDuration = (start, end) => {
 
   return durationValue.format(DatetimeFormat.M_DURATION);
 };
+
+const sortByDurationDesc = (pointA, pointB) => {
+  const pointADuration = getDuration(pointA.dateFrom, pointA.dateTo);
+  const pointBDuration = getDuration(pointB.dateFrom, pointB.dateTo);
+
+  return pointBDuration.asMilliseconds() - pointADuration.asMilliseconds();
+};
+
+const sortByDateFromAsc = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
 
 const getRandomDate = (isDateFrom) => {
   if (isDateFrom) {
@@ -48,11 +55,13 @@ const isDatePresent = (dateFrom, dateTo) => dayjs().isAfter(dateFrom) && dayjs()
 
 const isSameMonth = (dateFrom, dateTo) => dayjs(dateTo).isSame(dateFrom, 'M');
 
-
 export {
   DatetimeFormat,
   convertDatetime,
   getDuration,
+  formatDuration,
+  sortByDurationDesc,
+  sortByDateFromAsc,
   getRandomDate,
   isDateFuture,
   isDatePast,
