@@ -1,7 +1,7 @@
-import { getRandomInteger } from '../utils/common.js';
-
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+
+import { getRandomInteger } from '../utils/common.js';
 
 dayjs.extend(duration);
 
@@ -30,14 +30,14 @@ const formatDuration = (durationValue) => {
   return durationValue.format(DatetimeFormat.M_DURATION);
 };
 
-const sortByDurationDesc = (first, second) => {
-  const firstItem = getDuration(first.dateFrom, first.dateTo);
-  const secondItem = getDuration(second.dateFrom, second.dateTo);
+const sortByDurationDesc = (pointA, pointB) => {
+  const pointADuration = getDuration(pointA.dateFrom, pointA.dateTo);
+  const pointBDuration = getDuration(pointB.dateFrom, pointB.dateTo);
 
-  return secondItem.asMilliseconds() - firstItem.asMilliseconds();
+  return pointBDuration.asMilliseconds() - pointADuration.asMilliseconds();
 };
 
-const sortByDateAsc = (propertyName) => (first, second) => getDuration(second[propertyName], first[propertyName]).asMilliseconds();
+const sortByDateFromAsc = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
 
 const getRandomDate = (isDateFrom) => {
   if (isDateFrom) {
@@ -61,7 +61,7 @@ export {
   getDuration,
   formatDuration,
   sortByDurationDesc,
-  sortByDateAsc,
+  sortByDateFromAsc,
   getRandomDate,
   isDateFuture,
   isDatePast,

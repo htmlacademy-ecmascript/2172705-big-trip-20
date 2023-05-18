@@ -30,17 +30,10 @@ export default class EventsBoardFiltersView extends AbstractView {
   constructor({ filters, onFiltersChange }) {
     super();
     this.#filters = filters;
-    this.#onFiltersChange = onFiltersChange;
-    this.element.addEventListener('change', this.#filtersChangeHandler);
+    this.element.addEventListener('change', onFiltersChange);
   }
 
   get template() {
     return createFiltersTemplate(this.#filters);
   }
-
-  #filtersChangeHandler = (evt) => {
-    if (evt.target.closest('.trip-filters__filter-input')) {
-      this.#onFiltersChange();
-    }
-  };
 }

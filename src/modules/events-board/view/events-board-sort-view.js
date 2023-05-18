@@ -19,7 +19,7 @@ const createEventsSortItemTemplate = (name, isDisabled, isChecked) => (/*html*/`
 
 const createEventsSortTemplate = () => (/*html*/`
     <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-      ${Object.values(SortType).map((type, index) => createEventsSortItemTemplate(type.name, type.isDisabled, index === 0)).join('')}
+      ${Object.values(SortType).map((type, index) => createEventsSortItemTemplate(type.name, type.disabled, index === 0)).join('')}
     </form>`
 );
 
@@ -36,9 +36,5 @@ export default class EventsBoardSortView extends AbstractView {
     return createEventsSortTemplate();
   }
 
-  #sortTypeChangeHandler = (evt) => {
-    if (evt.target.closest('.trip-sort__input')) {
-      this.#onSortTypeChange(evt.target.dataset.sortType.toUpperCase());
-    }
-  };
+  #sortTypeChangeHandler = (evt) => this.#onSortTypeChange(evt.target.dataset.sortType.toUpperCase());
 }

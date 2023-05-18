@@ -17,23 +17,23 @@ const EventMode = {
 const SortType = {
   DAY: {
     name: 'day',
-    isDisabled: false
+    disabled: false
   },
   EVENT: {
     name: 'event',
-    isDisabled: true
+    disabled: true
   },
   TIME: {
     name: 'time',
-    isDisabled: false
+    disabled: false
   },
   PRICE: {
     name: 'price',
-    isDisabled: false
+    disabled: false
   },
   OFFERS: {
     name: 'OFFERS',
-    isDisabled: true
+    disabled: true
   }
 };
 

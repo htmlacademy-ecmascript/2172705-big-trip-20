@@ -1,6 +1,6 @@
 import { RenderPosition ,render, remove } from '../../../framework/render.js';
 import { updateItem, sortByDesc } from '../../../utils/common.js';
-import { sortByDurationDesc, sortByDateAsc } from '../../../utils/date.js';
+import { sortByDurationDesc, sortByDateFromAsc } from '../../../utils/date.js';
 import { EMPTY_EVENTS_LIST_MESSAGE, EventMode, SortType } from '../../../const.js';
 
 import EventsBoardSortView from '../view/events-board-sort-view.js';
@@ -25,6 +25,8 @@ export default class EventsBoardPresenter {
   #eventsBoardListComponent = new EventsBoardListView();
   #eventPresenters = new Map();
 
+  #sortTypeByDefault = SortType.DAY;
+
   constructor({ destinationsModel, typeOffersModel, eventsModel }) {
     this.#destinationsModel = destinationsModel;
     this.#typeOffersModel = typeOffersModel;
@@ -36,7 +38,7 @@ export default class EventsBoardPresenter {
     this.#types = this.#typeOffersModel.types.slice();
     this.#events = this.#eventsModel.events.slice();
 
-    this.#sortByDay();
+    this.#sortEvents(this.#sortTypeByDefault);
 
     //! Временно
     // eslint-disable-next-line no-console
@@ -117,19 +119,19 @@ export default class EventsBoardPresenter {
     }
   };
 
-  #sortByDay() {
-    this.#events.sort(sortByDateAsc('dateFrom'));
-  }
-
   #sortEvents(type) {
-    if (type === SortType.DAY) {
-      this.#sortByDay();
-    }
-    if (type === SortType.TIME) {
-      this.#events.sort(sortByDurationDesc);
-    }
-    if (type === SortType.PRICE) {
-      this.#events.sort(sortByDesc('basePrice'));
+    switch(type) {
+      case(SortType.DAY):
+        this.#events.sort(sortByDateFromAsc);
+        break;
+      case(SortType.TIME):
+        this.#events.sort(sortByDurationDesc);
+        break;
+      case(SortType.PRICE):
+        this.#events.sort(sortByDesc('basePrice'));
+        break;
+      default:
+        throw new Error(`Не обнаружена реализация сортировки по полю ${type.name.toUpperCase()}`);
     }
   }
 
