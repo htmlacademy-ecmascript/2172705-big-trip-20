@@ -41,6 +41,7 @@ export default class EventPresenter {
     this.#eventEditItem = new EventEditItemView({
       data: this.#data,
       onRollupButtonClick: () => {
+        this.#eventEditItem.reset();
         this.#replaceEditFormToEventItem();
       },
       onEditFormSubmit: (updatedEvent) => {
@@ -73,6 +74,7 @@ export default class EventPresenter {
 
   resetView() {
     if (this.#mode !== EventMode.DEFAULT) {
+      this.#eventEditItem.reset();
       this.#replaceEditFormToEventItem();
     }
   }
@@ -84,6 +86,7 @@ export default class EventPresenter {
   #onDocumentEscapeKeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
+      this.#eventEditItem.reset();
       this.#replaceEditFormToEventItem();
       document.removeEventListener('keydown', this.#onDocumentEscapeKeydown);
     }

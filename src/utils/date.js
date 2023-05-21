@@ -1,9 +1,13 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import objectSupport from 'dayjs/plugin/objectSupport.js';
 
 import { getRandomInteger } from '../utils/common.js';
 
 dayjs.extend(duration);
+
+//! Временный костыль для моков
+dayjs.extend(objectSupport);
 
 const DatetimeFormat = {
   EVENT_DATE: 'MMM D',
