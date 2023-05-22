@@ -111,7 +111,7 @@ export default class EventsBoardPresenter {
 
   #changeEventMode = (mode, eventId) => {
     if (mode === EventMode.DEFAULT) {
-      this.#eventPresenters.forEach((presenter) => presenter.resetView());
+      this.#eventPresenters.forEach((presenter) => presenter.closeForm());
       this.#eventPresenters.get(eventId).updateMode(EventMode.EDITING);
     }
     if (mode === EventMode.EDITING) {

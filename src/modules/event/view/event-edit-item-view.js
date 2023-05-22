@@ -65,24 +65,29 @@ const createEventsEditOffersTemplate = (typeItem, eventSelectedOffers) => {
 //* Шаблон разметки выбора пункта назначения
 //* ------------------------------------------------------
 
-const createDestinationListTemplate = ({ destinations }) => (/*html*/`
-  <datalist id="destination-list">
+const createDestinationListTemplate = ({ destinations, event }) => (/*html*/`
+  <datalist id="destination-list-${event.id}">
     ${destinations.map((destination) => `<option value="${destination.name}" data-destination-id="${destination.id}"></option>`).join('')}
   </datalist>`);
 
 //* Шаблон разметки выбора типа события
 //* ------------------------------------------------------
 
-const isEventTypeSelected = (eventType, offerType) => eventType === offerType ? 'checked' : '';
-
-const createEventTypeListTemplate = ({ types }, eventType) => (/*html*/`
+const createEventTypeListTemplate = ({ types, event }) => (/*html*/`
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
         ${types.map((type) => (/*html*/`
           <div class="event__type-item">
-            <input id="event-type-${type.type}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.type}" ${isEventTypeSelected(eventType, type.type)}>
-            <label class="event__type-label  event__type-label--${type.type}" for="event-type-${type.type}">${capitalizeWord(type.type)}</label>
+            <input
+              id="event-type-${type.type}-${event.id}"
+              class="event__type-input  visually-hidden"
+              type="radio"
+              name="event-type"
+              value="${type.type}"
+              ${event.type === type.type ? 'checked' : ''}
+            >
+            <label class="event__type-label  event__type-label--${type.type}" for="event-type-${type.type}-${event.id}">${capitalizeWord(type.type)}</label>
           </div>`)).join('')}
       </fieldset>
     </div>`);
@@ -91,7 +96,7 @@ const createEventTypeListTemplate = ({ types }, eventType) => (/*html*/`
 //* ------------------------------------------------------
 
 const createEventsEditItemTemplate = ({ destinations, types, event }) => {
-  const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem } = event;
+  const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId } = event;
   let { dateFrom, dateTo} = event;
 
   //! Временный костыль для моков
@@ -104,36 +109,43 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
-            <label class="event__type  event__type-btn" for="event-type-toggle">
+            <label class="event__type  event__type-btn" for="event-type-toggle-${eventId}">
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType}.png" alt="Event type icon.">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle" type="checkbox">
-            ${createEventTypeListTemplate({ types }, eventType)}
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${eventId}" type="checkbox">
+            ${createEventTypeListTemplate({ types, event })}
           </div>
 
           <div class="event__field-group  event__field-group--destination">
-            <label class="event__label  event__type-output" for="event-destination">
+            <label class="event__label  event__type-output" for="event-destination-${eventId}">
               ${capitalizeWord(eventType)}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination" type="text" name="event-destination" value="${destinationItem.name}" list="destination-list">
-            ${createDestinationListTemplate({ destinations })}
+            <input
+              class="event__input  event__input--destination"
+              id="event-destination-${eventId}"
+              type="text" name="event-destination"
+              value="${destinationItem.name}"
+              list="destination-list-${eventId}"
+              data-event-id="${event.id}"
+            >
+            ${createDestinationListTemplate({ destinations, event })}
           </div>
 
-          <div class="event__field-group  event__field-group--time">
+          <div class="event__field-group  event__field-group--time-${eventId}">
             <label class="visually-hidden" for="event-start-time">From</label>
-            <input class="event__input  event__input--time" id="event-start-time" type="text" name="event-start-time" value="${convertDatetime(dateFrom, DatetimeFormat.EVENT_EDIT_DATE)}">
+            <input class="event__input  event__input--time" id="event-start-time-${eventId}" type="text" name="event-start-time" value="${convertDatetime(dateFrom, DatetimeFormat.EVENT_EDIT_DATE)}">
             &mdash;
-            <label class="visually-hidden" for="event-end-time">To</label>
-            <input class="event__input  event__input--time" id="event-end-time" type="text" name="event-end-time" value="${convertDatetime(dateTo, DatetimeFormat.EVENT_EDIT_DATE)}">
+            <label class="visually-hidden" for="event-end-time-${eventId}">To</label>
+            <input class="event__input  event__input--time" id="event-end-time-${eventId}" type="text" name="event-end-time" value="${convertDatetime(dateTo, DatetimeFormat.EVENT_EDIT_DATE)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
-            <label class="event__label" for="event-price">
+            <label class="event__label" for="event-price-${eventId}">
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-${eventId}" type="text" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -175,7 +187,7 @@ export default class EventEditItemView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollupButtonClickHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onRollupButtonClick);
     this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
 
     this.element.querySelector('.event__type-list').addEventListener('change', this.#eventTypeChangeHandler);
@@ -187,8 +199,6 @@ export default class EventEditItemView extends AbstractStatefulView {
       this.element.querySelector('.event__available-offers').addEventListener('change', this.#availableOfferChangeHandler);
     }
   }
-
-  #rollupButtonClickHandler = () => this.#onRollupButtonClick();
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
@@ -223,7 +233,7 @@ export default class EventEditItemView extends AbstractStatefulView {
   };
 
   #destinationFieldInputHandler = (evt) => {
-    const newInputValueId = Number(this.element.querySelector(`#destination-list [value='${evt.target.value}']`).dataset.destinationId);
+    const newInputValueId = Number(this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`).dataset.destinationId);
     this.updateElement({
       destination: newInputValueId,
       destinationItem: EventEditItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
