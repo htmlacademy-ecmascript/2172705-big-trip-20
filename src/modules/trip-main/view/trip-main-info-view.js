@@ -3,8 +3,8 @@ import { sortByAsc } from '../../../utils/common.js';
 import { DatetimeFormat, convertDatetime, isSameMonth } from '../../../utils/date.js';
 import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
 
-//! Определение наименования маршрута
-//! ------------------------------------------------------
+//* Определение наименования маршрута
+//* ------------------------------------------------------
 
 const getDestinationItem = (destinations, eventItem) => destinations.find((item) => item.id === eventItem.destination);
 
@@ -19,8 +19,8 @@ const getTitle = ({ destinations, events }) => {
 };
 
 
-//! Определение дат начала и конца путешествия
-//! ------------------------------------------------------
+//* Определение дат начала и конца путешествия
+//* ------------------------------------------------------
 
 const getTripDates = ({ events }) => {
   if (!events.length) {
@@ -40,8 +40,8 @@ const getTripDates = ({ events }) => {
   return `${formattedDateFrom}&nbsp;&mdash;&nbsp;${formattedDateTo}`;
 };
 
-//! Подсчет итоговой стоимости
-//! ------------------------------------------------------
+//* Подсчет итоговой стоимости
+//* ------------------------------------------------------
 
 const calculateTotalCost = ({ types, events }) => {
   if (!events.length) {
