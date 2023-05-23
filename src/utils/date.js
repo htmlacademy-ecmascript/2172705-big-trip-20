@@ -19,6 +19,8 @@ const DatetimeFormat = {
   M_DURATION: 'mm[M]'
 };
 
+const stringToDayjsObj = (stringDate) => dayjs(stringDate);
+
 const convertDatetime = (datetime, format) => dayjs(datetime).format(format);
 
 const getDuration = (start, end) => dayjs.duration(dayjs(end).diff(dayjs(start)));
@@ -61,6 +63,7 @@ const isSameMonth = (dateFrom, dateTo) => dayjs(dateTo).isSame(dateFrom, 'M');
 
 export {
   DatetimeFormat,
+  stringToDayjsObj,
   convertDatetime,
   getDuration,
   formatDuration,

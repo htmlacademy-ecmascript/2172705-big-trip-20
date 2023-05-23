@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
 import { capitalizeWord, renameKeys } from '../../../utils/common.js';
-import { DatetimeFormat, convertDatetime, getDuration, formatDuration } from '../../../utils/date.js';
+import { DatetimeFormat, stringToDayjsObj, convertDatetime, getDuration, formatDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -32,9 +32,21 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
   const typeItem = types.find((type) => type.type === eventType);
 
   //! Временный костыль для моков
+  //! ----------------------------------------------------------------------------
   const newKeys = {$y: 'year', $M: 'month', $D: 'day', $H: 'hour', $m: 'minute'};
-  dateFrom = renameKeys(dateFrom, newKeys);
-  dateTo = renameKeys(dateTo, newKeys);
+
+  if ('$y' in dateFrom) {
+    dateFrom = renameKeys(dateFrom, newKeys);
+  } else {
+    dateFrom = stringToDayjsObj(dateFrom);
+  }
+
+  if ('$y' in dateTo) {
+    dateTo = renameKeys(dateTo, newKeys);
+  } else {
+    dateTo = stringToDayjsObj(dateTo);
+  }
+  //! ----------------------------------------------------------------------------
 
   return (/*html*/`
     <li class="trip-events__item">

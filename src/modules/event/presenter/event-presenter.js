@@ -30,23 +30,14 @@ export default class EventPresenter {
 
     this.#eventItem = new EventItemView({
       data: this.#data,
-      onRollupButtonClick: () => {
-        this.#replaceEventItemToEditForm();
-      },
-      onFavoriteButtonClick: () => {
-        this.#rerenderEvent({ ...this.#data.event, isFavorite: !this.#data.event.isFavorite });
-      }
+      onRollupButtonClick: this.#onEventRollupButtonClick,
+      onFavoriteButtonClick: this.#onFavoriteButtonClick
     });
 
     this.#eventEditItem = new EventEditItemView({
       data: this.#data,
-      onRollupButtonClick: () => {
-        this.closeForm();
-      },
-      onEditFormSubmit: (updatedEvent) => {
-        this.#replaceEditFormToEventItem();
-        this.#rerenderEvent(updatedEvent);
-      }
+      onRollupButtonClick: this.#onEditFormRollupButtonClick,
+      onEditFormSubmit: this.#onEditFormSubmit
     });
 
     if (prevEventItem === null) {
@@ -81,6 +72,17 @@ export default class EventPresenter {
   updateMode(mode) {
     this.#mode = mode;
   }
+
+  #onEventRollupButtonClick = () => this.#replaceEventItemToEditForm();
+
+  #onFavoriteButtonClick = () => this.#rerenderEvent({ ...this.#data.event, isFavorite: !this.#data.event.isFavorite });
+
+  #onEditFormRollupButtonClick = () => this.closeForm();
+
+  #onEditFormSubmit = (updatedEvent) => {
+    this.#replaceEditFormToEventItem();
+    this.#rerenderEvent(updatedEvent);
+  };
 
   #onDocumentEscapeKeydown = (evt) => {
     if (evt.key === 'Escape') {
