@@ -1,6 +1,6 @@
 import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
-import { capitalizeWord, renameKeys } from '../../../utils/common.js';
-import { DatetimeFormat, stringToDayjsObj, convertDatetime } from '../../../utils/date.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DatetimeFormat, convertDatetime } from '../../../utils/date.js';
 
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -99,25 +99,7 @@ const createEventTypeListTemplate = ({ types, event }) => (/*html*/`
 //* ------------------------------------------------------
 
 const createEventsEditItemTemplate = ({ destinations, types, event }) => {
-  const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId } = event;
-  let { dateFrom, dateTo} = event;
-
-  //! Временный костыль для моков
-  //! ----------------------------------------------------------------------------
-  const newKeys = {$y: 'year', $M: 'month', $D: 'day', $H: 'hour', $m: 'minute'};
-
-  if ('$y' in dateFrom) {
-    dateFrom = renameKeys(dateFrom, newKeys);
-  } else {
-    dateFrom = stringToDayjsObj(dateFrom);
-  }
-
-  if ('$y' in dateTo) {
-    dateTo = renameKeys(dateTo, newKeys);
-  } else {
-    dateTo = stringToDayjsObj(dateTo);
-  }
-  //! ----------------------------------------------------------------------------
+  const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId, dateFrom, dateTo } = event;
 
   return (/*html*/`
     <li class="trip-events__item">
@@ -231,19 +213,35 @@ export default class EventEditItemView extends AbstractStatefulView {
       this.element.querySelector('.event__available-offers').addEventListener('change', this.#availableOfferChangeHandler);
     }
 
-    this.#setDatePicker('dateFrom', `#event-start-time-${this._state.id}`);
-    this.#setDatePicker('dateTo', `#event-end-time-${this._state.id}`);
+    this.#setDateFromPicker();
+    this.#setDateToPicker();
   }
 
-  #setDatePicker(picker, selector) {
-    this.#datePickers[picker] = flatpickr(
-      this.element.querySelector(selector),
+  #setDateFromPicker() {
+    this.#datePickers.dateFrom = flatpickr(
+      this.element.querySelector(`#event-start-time-${this._state.id}`),
       {
         enableTime: true,
-        // eslint-disable-next-line camelcase
-        time_24hr: true,
+        'time_24hr': true,
         dateFormat: 'd/m/y H:i',
-        onChange: this.#createDatetimeChangeHandler(picker)
+        minDate: 'today',
+        maxDate: this.element.querySelector(`#event-end-time-${this._state.id}`).value,
+        onChange: this.#createDatetimeChangeHandler('dateFrom'),
+        onClose: (_, datetime) => this.#datePickers.dateTo.set('minDate', datetime)
+      }
+    );
+  }
+
+  #setDateToPicker() {
+    this.#datePickers.dateTo = flatpickr(
+      this.element.querySelector(`#event-end-time-${this._state.id}`),
+      {
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        minDate: this.element.querySelector(`#event-start-time-${this._state.id}`).value,
+        onChange: this.#createDatetimeChangeHandler('dateTo'),
+        onClose: (_, datetime) => this.#datePickers.dateFrom.set('maxDate', datetime)
       }
     );
   }
@@ -274,7 +272,8 @@ export default class EventEditItemView extends AbstractStatefulView {
   };
 
   #createDatetimeChangeHandler = (propertyName) => ([datetime]) => {
-    this.updateElement({
+    this._setState({
+      ...this._state,
       [propertyName]: datetime
     });
   };

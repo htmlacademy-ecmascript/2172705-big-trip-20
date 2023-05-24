@@ -1,13 +1,9 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import objectSupport from 'dayjs/plugin/objectSupport.js';
 
 import { getRandomInteger } from '../utils/common.js';
 
 dayjs.extend(duration);
-
-//! Временный костыль для моков
-dayjs.extend(objectSupport);
 
 const DatetimeFormat = {
   EVENT_DATE: 'MMM D',
@@ -18,8 +14,6 @@ const DatetimeFormat = {
   H_M_DURATION: 'HH[H] mm[M]',
   M_DURATION: 'mm[M]'
 };
-
-const stringToDayjsObj = (stringDate) => dayjs(stringDate);
 
 const convertDatetime = (datetime, format) => dayjs(datetime).format(format);
 
@@ -47,10 +41,20 @@ const sortByDateFromAsc = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(
 
 const getRandomDate = (isDateFrom) => {
   if (isDateFrom) {
-    return dayjs().subtract(getRandomInteger(1, 5), 'd').subtract(getRandomInteger(1, 23), 'h').subtract(getRandomInteger(1, 59), 'm').subtract(getRandomInteger(1, 59), 's');
+    return dayjs()
+      .subtract(getRandomInteger(1, 5), 'd')
+      .subtract(getRandomInteger(1, 23), 'h')
+      .subtract(getRandomInteger(1, 59), 'm')
+      .subtract(getRandomInteger(1, 59), 's')
+      .toDate();
   }
 
-  return dayjs().add(getRandomInteger(1, 5), 'd').add(getRandomInteger(1, 23), 'h').add(getRandomInteger(1, 59), 'm').add(getRandomInteger(1, 59), 's');
+  return dayjs()
+    .add(getRandomInteger(1, 5), 'd')
+    .add(getRandomInteger(1, 23), 'h')
+    .add(getRandomInteger(1, 59), 'm')
+    .add(getRandomInteger(1, 59), 's')
+    .toDate();
 };
 
 const isDateFuture = (dateFrom) => dayjs().isBefore(dateFrom);
@@ -63,7 +67,6 @@ const isSameMonth = (dateFrom, dateTo) => dayjs(dateTo).isSame(dateFrom, 'M');
 
 export {
   DatetimeFormat,
-  stringToDayjsObj,
   convertDatetime,
   getDuration,
   formatDuration,

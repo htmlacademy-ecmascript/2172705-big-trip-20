@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-import { capitalizeWord, renameKeys } from '../../../utils/common.js';
-import { DatetimeFormat, stringToDayjsObj, convertDatetime, getDuration, formatDuration } from '../../../utils/date.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DatetimeFormat, convertDatetime, getDuration, formatDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -25,28 +25,10 @@ const createSelectedOffersTemplate = (eventSelectedOffers, typeItem) => {
 };
 
 const createEventsItemTemplate = ({ destinations, types, event }) => {
-  const { type: eventType, destination: destinationId, offers: eventSelectedOffers, basePrice, isFavorite } = event;
-  let { dateFrom, dateTo} = event;
+  const { type: eventType, destination: destinationId, offers: eventSelectedOffers, basePrice, isFavorite, dateFrom, dateTo } = event;
 
   const destinationItem = destinations.find((destination) => destination.id === destinationId);
   const typeItem = types.find((type) => type.type === eventType);
-
-  //! Временный костыль для моков
-  //! ----------------------------------------------------------------------------
-  const newKeys = {$y: 'year', $M: 'month', $D: 'day', $H: 'hour', $m: 'minute'};
-
-  if ('$y' in dateFrom) {
-    dateFrom = renameKeys(dateFrom, newKeys);
-  } else {
-    dateFrom = stringToDayjsObj(dateFrom);
-  }
-
-  if ('$y' in dateTo) {
-    dateTo = renameKeys(dateTo, newKeys);
-  } else {
-    dateTo = stringToDayjsObj(dateTo);
-  }
-  //! ----------------------------------------------------------------------------
 
   return (/*html*/`
     <li class="trip-events__item">
