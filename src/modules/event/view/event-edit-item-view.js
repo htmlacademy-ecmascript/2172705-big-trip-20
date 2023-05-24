@@ -224,7 +224,6 @@ export default class EventEditItemView extends AbstractStatefulView {
         enableTime: true,
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
-        minDate: 'today',
         maxDate: this.element.querySelector(`#event-end-time-${this._state.id}`).value,
         onChange: this.#createDatetimeChangeHandler('dateFrom'),
         onClose: (_, datetime) => this.#datePickers.dateTo.set('minDate', datetime)
