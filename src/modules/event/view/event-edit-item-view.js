@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
-import { capitalizeWord, renameKeys } from '../../../utils/common.js';
+import { capitalizeWord } from '../../../utils/common.js';
 import { DatetimeFormat, convertDatetime } from '../../../utils/date.js';
+
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 //* Шаблон разметки пункта назначения
 //* ------------------------------------------------------
@@ -96,13 +99,7 @@ const createEventTypeListTemplate = ({ types, event }) => (/*html*/`
 //* ------------------------------------------------------
 
 const createEventsEditItemTemplate = ({ destinations, types, event }) => {
-  const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId } = event;
-  let { dateFrom, dateTo} = event;
-
-  //! Временный костыль для моков
-  const newKeys = {$y: 'year', $M: 'month', $D: 'day', $H: 'hour', $m: 'minute'};
-  dateFrom = renameKeys(dateFrom, newKeys);
-  dateTo = renameKeys(dateTo, newKeys);
+  const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId, dateFrom, dateTo } = event;
 
   return (/*html*/`
     <li class="trip-events__item">
@@ -169,6 +166,12 @@ export default class EventEditItemView extends AbstractStatefulView {
   #onEditFormSubmit = null;
   #onRollupButtonClick = null;
 
+  #datePickers = {
+    dateFrom: null,
+    dateTo: null
+  };
+
+
   constructor({ data: { destinations, types, event }, onRollupButtonClick, onEditFormSubmit }) {
     super();
     this.#data = { destinations, types, event };
@@ -180,6 +183,17 @@ export default class EventEditItemView extends AbstractStatefulView {
 
   get template() {
     return createEventsEditItemTemplate({ ...this.#data, event: this._state });
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    Object.entries(this.#datePickers).forEach(([picker, isExist]) => {
+      if (isExist) {
+        this.#datePickers[picker].destroy();
+        this.#datePickers[picker] = null;
+      }
+    });
   }
 
   reset() {
@@ -198,6 +212,37 @@ export default class EventEditItemView extends AbstractStatefulView {
     if (this._state.typeItem.offers.length !== 0) {
       this.element.querySelector('.event__available-offers').addEventListener('change', this.#availableOfferChangeHandler);
     }
+
+    this.#setDateFromPicker();
+    this.#setDateToPicker();
+  }
+
+  #setDateFromPicker() {
+    this.#datePickers.dateFrom = flatpickr(
+      this.element.querySelector(`#event-start-time-${this._state.id}`),
+      {
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        maxDate: this.element.querySelector(`#event-end-time-${this._state.id}`).value,
+        onChange: this.#createDatetimeChangeHandler('dateFrom'),
+        onClose: (_, datetime) => this.#datePickers.dateTo.set('minDate', datetime)
+      }
+    );
+  }
+
+  #setDateToPicker() {
+    this.#datePickers.dateTo = flatpickr(
+      this.element.querySelector(`#event-end-time-${this._state.id}`),
+      {
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        minDate: this.element.querySelector(`#event-start-time-${this._state.id}`).value,
+        onChange: this.#createDatetimeChangeHandler('dateTo'),
+        onClose: (_, datetime) => this.#datePickers.dateFrom.set('maxDate', datetime)
+      }
+    );
   }
 
   #formSubmitHandler = (evt) => {
@@ -210,6 +255,32 @@ export default class EventEditItemView extends AbstractStatefulView {
       offers: [],
       type: evt.target.value,
       typeItem: EventEditItemView.#getTypeItem(this.#data.types, evt.target.value)
+    });
+  };
+
+  #destinationFieldClickHandler = (evt) => {
+    evt.target.value = null;
+  };
+
+  #destinationFieldInputHandler = (evt) => {
+    const newInputValueId = Number(this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`).dataset.destinationId);
+    this.updateElement({
+      destination: newInputValueId,
+      destinationItem: EventEditItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
+    });
+  };
+
+  #createDatetimeChangeHandler = (propertyName) => ([datetime]) => {
+    this._setState({
+      ...this._state,
+      [propertyName]: datetime
+    });
+  };
+
+  #priceFieldInputHandler = (evt) => {
+    this._setState({
+      ...this._state,
+      basePrice: evt.target.value
     });
   };
 
@@ -228,25 +299,6 @@ export default class EventEditItemView extends AbstractStatefulView {
     });
   };
 
-  #destinationFieldClickHandler = (evt) => {
-    evt.target.value = null;
-  };
-
-  #destinationFieldInputHandler = (evt) => {
-    const newInputValueId = Number(this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`).dataset.destinationId);
-    this.updateElement({
-      destination: newInputValueId,
-      destinationItem: EventEditItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
-    });
-
-  };
-
-  #priceFieldInputHandler = (evt) => {
-    this._setState({
-      ...this._state,
-      basePrice: evt.target.value
-    });
-  };
 
   static parseEventDataToState({ destinations, types, event }) {
     return {
