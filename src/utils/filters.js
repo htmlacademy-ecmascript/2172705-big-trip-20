@@ -1,5 +1,12 @@
 import { FilterType } from '../const.js';
-import { isDateFuture, isDatePast, isDatePresent } from './date.js';
+import { isDateFuture, isDatePresent, isDatePast } from './date.js';
+
+const filterEventsBy = {
+  [FilterType.EVERYTHING]: (events) => events,
+  [FilterType.FUTURE]: (events) => events.filter((event) => isDateFuture(event.dateFrom)),
+  [FilterType.PRESENT]: (events) => events.filter((event) => isDatePresent(event.dateFrom, event.dateTo)),
+  [FilterType.PAST]: (events) => events.filter((event) => isDatePast(event.dateTo))
+};
 
 const initFilterTypes = (events) => Object.values(FilterType).reduce((result, filter) => {
   if (filter === FilterType.EVERYTHING) {
@@ -30,4 +37,4 @@ const generateFilters = (events) => events.reduce((result, event) => {
 }, { ...initFilterTypes(events) }
 );
 
-export { generateFilters };
+export { generateFilters, filterEventsBy };

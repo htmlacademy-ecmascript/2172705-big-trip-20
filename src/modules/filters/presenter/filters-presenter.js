@@ -1,26 +1,49 @@
-import { render } from '../../../framework/render.js';
+import { render, replace, remove } from '../../../framework/render.js';
 import { generateFilters } from '../../../utils/filters.js';
+import { UpdateType } from '../../../const.js';
 
 import EventsBoardFiltersView from '../view/filters-view.js';
 
-const tripFilters = document.querySelector('.trip-controls__filters');
+const tripMain = document.querySelector('.trip-main');
 
 export default class FiltersPresenter {
-  #onFiltersChange = null;
+  #eventsModel = null;
+  #filtersModel = null;
 
-  #generatedFilters = [];
+  #filtersComponent = null;
 
-  constructor({ onFiltersChange }) {
-    this.#onFiltersChange = onFiltersChange;
+  constructor({ eventsModel, filtersModel }) {
+    this.#eventsModel = eventsModel;
+    this.#filtersModel = filtersModel;
+
+    this.#eventsModel.addObserver(this.#onFiltersModelChange);
+    this.#filtersModel.addObserver(this.#onFiltersModelChange);
   }
 
-  init({ events }) {
-    this.#generatedFilters = generateFilters(events.slice());
-
-    this.#renderFilters();
+  get filters() {
+    return generateFilters(this.#eventsModel.events);
   }
 
-  #renderFilters() {
-    render(new EventsBoardFiltersView({ filters: this.#generatedFilters, onFiltersChange: this.#onFiltersChange }), tripFilters);
+  init() {
+    const prevFiltersComponent = this.#filtersComponent;
+    this.#filtersComponent = new EventsBoardFiltersView({
+      filters: this.filters,
+      currentFilter: this.#filtersModel.currentFilter,
+      onFiltersChange: this.#onFiltersChange
+    });
+
+    if (prevFiltersComponent === null) {
+      render(this.#filtersComponent, tripMain);
+      return;
+    }
+
+    replace(this.#filtersComponent, prevFiltersComponent);
+    remove(prevFiltersComponent);
   }
+
+  #onFiltersModelChange = () => {
+    this.init();
+  };
+
+  #onFiltersChange = (filter) => this.#filtersModel.setCurrentFilter(UpdateType.MAJOR, filter);
 }

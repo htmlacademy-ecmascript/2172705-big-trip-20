@@ -5,7 +5,7 @@ import { getRandomInteger } from '../utils/common.js';
 
 dayjs.extend(duration);
 
-const DatetimeFormat = {
+const DateFormat = {
   EVENT_DATE: 'MMM D',
   SHORT_EVENT_DATE: 'D',
   EVENT_EDIT_DATE: 'DD/MM/YY HH:mm',
@@ -15,19 +15,19 @@ const DatetimeFormat = {
   M_DURATION: 'mm[M]'
 };
 
-const convertDatetime = (datetime, format) => dayjs(datetime).format(format);
+const convertDate = (date, format) => dayjs(date).format(format);
 
 const getDuration = (start, end) => dayjs.duration(dayjs(end).diff(dayjs(start)));
 
 const formatDuration = (durationValue) => {
   if (durationValue.get('day')) {
-    return durationValue.format(DatetimeFormat.D_H_M_DURATION);
+    return durationValue.format(DateFormat.D_H_M_DURATION);
   }
   if (!durationValue.get('day') && durationValue.get('hour')) {
-    return durationValue.format(DatetimeFormat.H_M_DURATION);
+    return durationValue.format(DateFormat.H_M_DURATION);
   }
 
-  return durationValue.format(DatetimeFormat.M_DURATION);
+  return durationValue.format(DateFormat.M_DURATION);
 };
 
 const sortByDurationDesc = (pointA, pointB) => {
@@ -59,15 +59,20 @@ const getRandomDate = (isDateFrom) => {
 
 const isDateFuture = (dateFrom) => dayjs().isBefore(dateFrom);
 
-const isDatePast = (dateTo) => dayjs().isAfter(dateTo);
-
 const isDatePresent = (dateFrom, dateTo) => dayjs().isAfter(dateFrom) && dayjs().isBefore(dateTo);
 
-const isSameMonth = (dateFrom, dateTo) => dayjs(dateTo).isSame(dateFrom, 'M');
+const isDatePast = (dateTo) => dayjs().isAfter(dateTo);
+
+const isSameDate = (firstDate, secondDate, unit = null) => {
+  if (unit) {
+    return dayjs(firstDate).isSame(secondDate, unit);
+  }
+  return dayjs(firstDate).isSame(secondDate);
+};
 
 export {
-  DatetimeFormat,
-  convertDatetime,
+  DateFormat,
+  convertDate,
   getDuration,
   formatDuration,
   sortByDurationDesc,
@@ -76,5 +81,5 @@ export {
   isDateFuture,
   isDatePast,
   isDatePresent,
-  isSameMonth
+  isSameDate
 };

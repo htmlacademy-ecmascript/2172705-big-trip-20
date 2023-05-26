@@ -1,6 +1,7 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
+
 import { capitalizeWord } from '../../../utils/common.js';
-import { DatetimeFormat, convertDatetime, getDuration, formatDuration } from '../../../utils/date.js';
+import { DateFormat, convertDate, getDuration, formatDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
@@ -33,16 +34,16 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
   return (/*html*/`
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${dateFrom}">${convertDatetime(dateFrom, DatetimeFormat.EVENT_DATE)}</time>
+        <time class="event__date" datetime="${dateFrom}">${convertDate(dateFrom, DateFormat.EVENT_DATE)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${capitalizeWord(eventType)} ${destinationItem.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom}">${convertDatetime(dateFrom, DatetimeFormat.TIME)}</time>
+            <time class="event__start-time" datetime="${dateFrom}">${convertDate(dateFrom, DateFormat.TIME)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateTo}">${convertDatetime(dateTo, DatetimeFormat.TIME)}</time>
+            <time class="event__end-time" datetime="${dateTo}">${convertDate(dateTo, DateFormat.TIME)}</time>
           </p>
           <p class="event__duration">${formatDuration(getDuration(dateFrom, dateTo))}</p>
         </div>

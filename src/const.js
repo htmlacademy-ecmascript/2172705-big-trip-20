@@ -1,18 +1,4 @@
-const EMPTY_EVENTS_LIST_MESSAGE = 'Click New Event to create your first point';
-
 const MAX_DISPLAYED_DESTINATIONS = 3;
-
-const FilterType = {
-  EVERYTHING: 'everything',
-  FUTURE: 'future',
-  PRESENT: 'present',
-  PAST: 'past'
-};
-
-const EventMode = {
-  DEFAULT: 'default',
-  EDITING: 'editing'
-};
 
 const SortType = {
   DAY: {
@@ -32,9 +18,40 @@ const SortType = {
     disabled: false
   },
   OFFERS: {
-    name: 'OFFERS',
+    name: 'offers',
     disabled: true
   }
 };
 
-export { EMPTY_EVENTS_LIST_MESSAGE, MAX_DISPLAYED_DESTINATIONS, FilterType, EventMode, SortType };
+const FilterType = {
+  EVERYTHING: 'EVERYTHING',
+  FUTURE: 'FUTURE',
+  PRESENT: 'PRESENT',
+  PAST: 'PAST'
+};
+
+const NoEventsByFilter = {
+  [FilterType.EVERYTHING]: 'Click "New Event" to create your first point',
+  [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.PAST]: 'There are no past events now'
+};
+
+const EventMode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING'
+};
+
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT'
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
+};
+
+export { MAX_DISPLAYED_DESTINATIONS, SortType, FilterType, NoEventsByFilter, EventMode, UserAction, UpdateType };

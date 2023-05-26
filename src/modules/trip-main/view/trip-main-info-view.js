@@ -1,6 +1,6 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
 import { sortByAsc } from '../../../utils/common.js';
-import { DatetimeFormat, convertDatetime, isSameMonth } from '../../../utils/date.js';
+import { DateFormat, convertDate, isSameDate } from '../../../utils/date.js';
 import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
 
 //* Определение наименования маршрута
@@ -30,11 +30,11 @@ const getTripDates = ({ events }) => {
   const firstEventSortedByDateTo = events.sort(sortByAsc('dateFrom')).at(0);
   const lastEventSortedByDateTo = events.sort(sortByAsc('dateTo')).at(-1);
 
-  const formattedDateFrom = convertDatetime(firstEventSortedByDateTo.dateFrom, DatetimeFormat.EVENT_DATE);
-  let formattedDateTo = convertDatetime(lastEventSortedByDateTo.dateTo, DatetimeFormat.EVENT_DATE);
+  const formattedDateFrom = convertDate(firstEventSortedByDateTo.dateFrom, DateFormat.EVENT_DATE);
+  let formattedDateTo = convertDate(lastEventSortedByDateTo.dateTo, DateFormat.EVENT_DATE);
 
-  if (isSameMonth(formattedDateFrom, formattedDateTo)) {
-    formattedDateTo = convertDatetime(lastEventSortedByDateTo.dateTo, DatetimeFormat.SHORT_EVENT_DATE);
+  if (isSameDate(formattedDateFrom, formattedDateTo, 'M')) {
+    formattedDateTo = convertDate(lastEventSortedByDateTo.dateTo, DateFormat.SHORT_EVENT_DATE);
   }
 
   return `${formattedDateFrom}&nbsp;&mdash;&nbsp;${formattedDateTo}`;
