@@ -31,10 +31,10 @@ export default class NewEventPresenter {
   }
 
   init() {
-    this.#renderNewEvent();
+    this.#renderNewEventButton();
   }
 
-  createEvent() {
+  #createNewEvent() {
     this.#newEventFormComponent = new EventFormItemView({
       data: { destinations: this.#destinationsModel.destinations, types: this.#typeOffersModel.types, event: this.#createNewEventBlank() },
       isNewEvent: true,
@@ -43,22 +43,22 @@ export default class NewEventPresenter {
     });
 
     render(this.#newEventFormComponent, this.#eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#onEscKeydownClick);
   }
 
-  destroy() {
+  closeNewEventForm = () => {
     if (this.#newEventFormComponent === null) {
       return;
     }
 
     this.#newEventButtonComponent.element.disabled = false;
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#onEscKeydownClick);
 
     remove(this.#newEventFormComponent);
     this.#newEventFormComponent = null;
-  }
+  };
 
-  #renderNewEvent() {
+  #renderNewEventButton() {
     this.#newEventButtonComponent = new NewEventButtonView({
       onNewEventButtonClick: this.#onNewEventButtonClick
     });
@@ -73,14 +73,14 @@ export default class NewEventPresenter {
       destination: this.#destinationsModel.destinations[0].id,
       isFavorite: false,
       offers: [],
-      type: 'taxi'
+      type: this.#typeOffersModel.types[0].type
     };
   }
 
   #onNewEventButtonClick = () => {
     this.#boardPresenter.setDefaultSortType();
     this.#filtersModel.setCurrentFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.createEvent();
+    this.#createNewEvent();
     this.#newEventButtonComponent.element.disabled = true;
   };
 
@@ -90,17 +90,15 @@ export default class NewEventPresenter {
       UpdateType.MINOR,
       { ...newEvent, id: nanoid() }
     );
-    this.destroy();
+    this.closeNewEventForm();
   };
 
-  #onCancelButtonClick = () => {
-    this.destroy();
-  };
+  #onCancelButtonClick = () => this.closeNewEventForm();
 
-  #escKeyDownHandler = (evt) => {
+  #onEscKeydownClick = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
-      this.destroy();
+      this.closeNewEventForm();
     }
   };
 }

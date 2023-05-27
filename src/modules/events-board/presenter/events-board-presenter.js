@@ -24,6 +24,7 @@ export default class EventsBoardPresenter {
   #eventsBoardListComponent = new EventsBoardListView();
 
   #eventPresenters = new Map();
+  #newEventPresenter = null;
 
   #currentSortType = SortType.DAY;
   #defaultSortType = SortType.DAY;
@@ -72,12 +73,13 @@ export default class EventsBoardPresenter {
   }
 
   #renderEventsBoard() {
+    this.#renderEventsBoardList();
+
     if (!this.events.length) {
       this.#renderEventsBoardMessage({ currentFilter: this.#filtersModel.currentFilter });
       return;
     }
 
-    this.#renderEventsBoardList();
     this.#renderEventsBoardSort();
   }
 
@@ -108,12 +110,11 @@ export default class EventsBoardPresenter {
 
   #renderEventsBoardMessage({ message, currentFilter }) {
     this.#eventsBoardMessageComponent = new EventsBoardMessageView({ message, currentFilter });
-
     render(this.#eventsBoardMessageComponent, tripEvents);
   }
 
   #renderNewEventButton() {
-    const newEventPresenter = new NewEventPresenter({
+    this.#newEventPresenter = new NewEventPresenter({
       destinationsModel: this.#destinationsModel,
       typeOffersModel: this.#typeOffersModel,
       filtersModel: this.#filtersModel,
@@ -121,7 +122,8 @@ export default class EventsBoardPresenter {
       eventsBoardListComponent: this.#eventsBoardListComponent,
       onEventUserAction: this.#onEventUserAction
     });
-    newEventPresenter.init();
+
+    this.#newEventPresenter.init();
   }
 
   #clearEventsBoard({ resetSortType = false } = {}) {
@@ -130,10 +132,7 @@ export default class EventsBoardPresenter {
 
     remove(this.#eventsBoardSortComponent);
     remove(this.#eventsBoardListComponent);
-
-    if (this.#eventsBoardMessageComponent) {
-      remove(this.#eventsBoardMessageComponent);
-    }
+    remove(this.#eventsBoardMessageComponent);
 
     if (resetSortType) {
       this.#currentSortType = this.#defaultSortType;
@@ -175,7 +174,8 @@ export default class EventsBoardPresenter {
   };
 
   #onEventModeChange = () => {
-    this.#eventPresenters.forEach((presenter) => presenter.closeForm());
+    this.#eventPresenters.forEach((presenter) => presenter.closeEventEditForm());
+    this.#newEventPresenter.closeNewEventForm();
   };
 
   #onSortTypeChange = (sortTypeName) => {

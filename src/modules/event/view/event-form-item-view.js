@@ -278,8 +278,9 @@ export default class EventFormItemView extends AbstractStatefulView {
 
   #destinationFieldInputHandler = (evt) => {
     const destinationListItem = this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`);
+
     if (destinationListItem) {
-      const newInputValueId = Number(this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`).dataset.destinationId);
+      const newInputValueId = Number(destinationListItem.dataset.destinationId);
       this.updateElement({
         destination: newInputValueId,
         destinationItem: EventFormItemView.#getDestinationItem(this.#data.destinations, newInputValueId)

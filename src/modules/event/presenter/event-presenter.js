@@ -64,7 +64,7 @@ export default class EventPresenter {
     remove(this.#eventFormItem);
   }
 
-  closeForm() {
+  closeEventEditForm() {
     if (this.#mode !== EventMode.DEFAULT) {
       this.#eventFormItem.reset();
       this.#replaceEditFormToEventItem();
@@ -86,7 +86,7 @@ export default class EventPresenter {
 
   #onEventRollupButtonClick = () => this.#replaceEventItemToEditForm();
 
-  #onEditFormRollupButtonClick = () => this.closeForm();
+  #onEditFormRollupButtonClick = () => this.closeEventEditForm();
 
   #onFavoriteButtonClick = () => this.#onEventUserAction(
     UserAction.UPDATE_EVENT,
@@ -119,7 +119,7 @@ export default class EventPresenter {
   #onDocumentEscapeKeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
-      this.closeForm();
+      this.closeEventEditForm();
       document.removeEventListener('keydown', this.#onDocumentEscapeKeydown);
     }
   };
