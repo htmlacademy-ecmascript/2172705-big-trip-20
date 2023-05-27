@@ -298,7 +298,7 @@ export default class EventFormItemView extends AbstractStatefulView {
   #priceFieldInputHandler = (evt) => {
     this._setState({
       ...this._state,
-      basePrice: evt.target.value
+      basePrice: Number(evt.target.value)
     });
   };
 
