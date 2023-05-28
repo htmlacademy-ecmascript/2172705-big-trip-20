@@ -1,8 +1,8 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
 
-import { NoEventsByFilter } from '../../../const.js';
+import { EmptyEventsListFilterMessage } from '../../../const.js';
 
-const createEventsMessageTemplate = (message, currentFilter) => `<p class="trip-events__msg">${message || NoEventsByFilter[currentFilter]}</p>`;
+const createEventsMessageTemplate = (message, currentFilter) => `<p class="trip-events__msg">${message || EmptyEventsListFilterMessage[currentFilter]}</p>`;
 
 export default class EventsBoardMessageView extends AbstractView {
   #message = null;

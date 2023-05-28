@@ -18,14 +18,16 @@ export default class EventsModel extends Observable {
     const updatedEventIndex = this.#events.findIndex((event) => event.id === updatedEvent.id);
 
     if (updatedEventIndex === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error(`Can't update unexisting ${updatedEvent}`);
     }
 
-    this.#events = [
-      ...this.#events.slice(0, updatedEventIndex),
-      updatedEvent,
-      ...this.#events.slice(updatedEventIndex + 1)
-    ];
+    this.#events = this.#events.map((event, index) => {
+      if (index === updatedEventIndex) {
+        return updatedEvent;
+      }
+
+      return event;
+    });
 
     this._notify(updateType, updatedEvent);
   }
@@ -43,13 +45,10 @@ export default class EventsModel extends Observable {
     const updatedEventIndex = this.#events.findIndex((event) => event.id === updatedEvent.id);
 
     if (updatedEventIndex === -1) {
-      throw new Error('Can\'t delete unexisting task');
+      throw new Error(`Can't delete unexisting ${updatedEvent}`);
     }
 
-    this.#events = [
-      ...this.#events.slice(0, updatedEventIndex),
-      ...this.#events.slice(updatedEventIndex + 1)
-    ];
+    this.#events = this.#events.filter((event) => event.id !== updatedEvent.id);
 
     this._notify(updateType);
   }

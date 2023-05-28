@@ -99,13 +99,13 @@ const createEventTypeListTemplate = ({ types, event }) => (/*html*/`
 //* Шаблон разметки изменения точки маршрута
 //* ------------------------------------------------------
 
-const createButtonsTemplate = (isNewEvent) => isNewEvent ? (/*html*/`
-  <button class="event__reset-btn" type="reset">Cancel</button>`) :
-  (/*html*/`
-  <button class="event__reset-btn" type="reset">Delete</button>
-  <button class="event__rollup-btn" type="button">
-    <span class="visually-hidden">Open event</span>
-  </button>`);
+const createButtonsTemplate = (isNewEvent) => isNewEvent
+  ? ('<button class="event__reset-btn" type="reset">Cancel</button>')
+  : (/*html*/`
+    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__rollup-btn" type="button">
+      <span class="visually-hidden">Open event</span>
+    </button>`);
 
 const createEventsFormItemTemplate = ({ destinations, types, event }, isNewEvent) => {
   const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId, dateFrom, dateTo } = event;

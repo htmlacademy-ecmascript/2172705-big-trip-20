@@ -59,7 +59,7 @@ export default class EventsBoardPresenter {
       case (SortType.PRICE):
         return filteredEvents.sort(sortByDesc('basePrice'));
       default:
-        throw new Error(`Не обнаружена реализация сортировки по полю ${this.#currentSortType.name.toUpperCase()}`);
+        throw new Error(`No implementation of sorting by field found ${this.#currentSortType.name.toUpperCase()}`);
     }
   }
 
@@ -151,7 +151,7 @@ export default class EventsBoardPresenter {
         this.#eventsModel.deleteEvent(updateType, updatedEvent);
         break;
       default:
-        throw new Error(`Не обнаружена реализация взаимодействия с моделью с типом действия пользователя ${actionType}`);
+        throw new Error(`No implementation of interaction with the model with the type of user action was found ${actionType}`);
     }
   };
 
@@ -169,7 +169,7 @@ export default class EventsBoardPresenter {
         this.#renderEventsBoard();
         break;
       default:
-        throw new Error(`Не обнаружена реализация обработки изменения модели с типом изменения ${updateType}`);
+        throw new Error(`No implementation of model change processing with the change type was found ${updateType}`);
     }
   };
 
