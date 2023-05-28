@@ -8,8 +8,6 @@ const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1
 
 const capitalizeWord = (word) => word[0].toUpperCase() + word.slice(1);
 
-const updateItem = (items, update) => items.map((item) => item.id === update.id ? update : item);
-
 const renameKeys = (obj, newKeys) => {
   const keyValues = Object.keys(obj).map((key) => {
     const newKey = newKeys[key] || key;
@@ -19,4 +17,4 @@ const renameKeys = (obj, newKeys) => {
   return Object.assign({}, ...keyValues);
 };
 
-export { sortByAsc, sortByDesc, getRandomArrayElement, getRandomInteger, capitalizeWord, updateItem, renameKeys };
+export { sortByAsc, sortByDesc, getRandomArrayElement, getRandomInteger, capitalizeWord, renameKeys };

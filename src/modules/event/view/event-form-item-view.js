@@ -1,6 +1,7 @@
 import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
+
 import { capitalizeWord } from '../../../utils/common.js';
-import { DatetimeFormat, convertDatetime } from '../../../utils/date.js';
+import { DateFormat, convertDate } from '../../../utils/date.js';
 
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -98,7 +99,15 @@ const createEventTypeListTemplate = ({ types, event }) => (/*html*/`
 //* Шаблон разметки изменения точки маршрута
 //* ------------------------------------------------------
 
-const createEventsEditItemTemplate = ({ destinations, types, event }) => {
+const createButtonsTemplate = (isNewEvent) => isNewEvent
+  ? ('<button class="event__reset-btn" type="reset">Cancel</button>')
+  : (/*html*/`
+    <button class="event__reset-btn" type="reset">Delete</button>
+    <button class="event__rollup-btn" type="button">
+      <span class="visually-hidden">Open event</span>
+    </button>`);
+
+const createEventsFormItemTemplate = ({ destinations, types, event }, isNewEvent) => {
   const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId, dateFrom, dateTo } = event;
 
   return (/*html*/`
@@ -131,10 +140,10 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
 
           <div class="event__field-group  event__field-group--time-${eventId}">
             <label class="visually-hidden" for="event-start-time">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${eventId}" type="text" name="event-start-time" value="${convertDatetime(dateFrom, DatetimeFormat.EVENT_EDIT_DATE)}">
+            <input class="event__input  event__input--time" id="event-start-time-${eventId}" type="text" name="event-start-time" value="${convertDate(dateFrom, DateFormat.EVENT_EDIT_DATE)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-${eventId}">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-${eventId}" type="text" name="event-end-time" value="${convertDatetime(dateTo, DatetimeFormat.EVENT_EDIT_DATE)}">
+            <input class="event__input  event__input--time" id="event-end-time-${eventId}" type="text" name="event-end-time" value="${convertDate(dateTo, DateFormat.EVENT_EDIT_DATE)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -142,28 +151,26 @@ const createEventsEditItemTemplate = ({ destinations, types, event }) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${eventId}" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" min="0" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          ${createButtonsTemplate(isNewEvent)}
         </header>
         <section class="event__details">
           ${createEventsEditOffersTemplate(typeItem, eventSelectedOffers)}
           ${createEventsEditDestinationTemplate(destinationItem)}
         </section>
       </form>
-    </li>`
-  );
+    </li>`);
 };
 
-export default class EventEditItemView extends AbstractStatefulView {
+export default class EventFormItemView extends AbstractStatefulView {
   #data = {};
+  #isNewEvent = null;
 
-  #onEditFormSubmit = null;
+  #onFormSubmit = null;
+  #onButtonClick = null;
   #onRollupButtonClick = null;
 
   #datePickers = {
@@ -171,18 +178,20 @@ export default class EventEditItemView extends AbstractStatefulView {
     dateTo: null
   };
 
-
-  constructor({ data: { destinations, types, event }, onRollupButtonClick, onEditFormSubmit }) {
+  constructor({ data: { destinations, types, event }, onFormSubmit, onButtonClick, onRollupButtonClick, isNewEvent = false }) {
     super();
     this.#data = { destinations, types, event };
-    this._setState(EventEditItemView.parseEventDataToState(this.#data));
-    this.#onEditFormSubmit = onEditFormSubmit;
+    this.#isNewEvent = isNewEvent;
+    this._setState(EventFormItemView.parseEventDataToState(this.#data));
+    this.#onFormSubmit = onFormSubmit;
+    this.#onButtonClick = onButtonClick;
     this.#onRollupButtonClick = onRollupButtonClick;
+
     this._restoreHandlers();
   }
 
   get template() {
-    return createEventsEditItemTemplate({ ...this.#data, event: this._state });
+    return createEventsFormItemTemplate({ ...this.#data, event: this._state }, this.#isNewEvent);
   }
 
   removeElement() {
@@ -197,16 +206,19 @@ export default class EventEditItemView extends AbstractStatefulView {
   }
 
   reset() {
-    this.updateElement(EventEditItemView.parseEventDataToState(this.#data));
+    this.updateElement(EventFormItemView.parseEventDataToState(this.#data));
   }
 
   _restoreHandlers() {
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onRollupButtonClick);
+    if (!this.#isNewEvent) {
+      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onRollupButtonClick);
+    }
     this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHandler);
 
     this.element.querySelector('.event__type-list').addEventListener('change', this.#eventTypeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('click', this.#destinationFieldClickHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationFieldInputHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationFieldInputHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#priceFieldInputHandler);
 
     if (this._state.typeItem.offers.length !== 0) {
@@ -225,8 +237,8 @@ export default class EventEditItemView extends AbstractStatefulView {
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         maxDate: this.element.querySelector(`#event-end-time-${this._state.id}`).value,
-        onChange: this.#createDatetimeChangeHandler('dateFrom'),
-        onClose: (_, datetime) => this.#datePickers.dateTo.set('minDate', datetime)
+        onChange: this.#createDateChangeHandler('dateFrom'),
+        onClose: (_, date) => this.#datePickers.dateTo.set('minDate', date)
       }
     );
   }
@@ -239,22 +251,24 @@ export default class EventEditItemView extends AbstractStatefulView {
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         minDate: this.element.querySelector(`#event-start-time-${this._state.id}`).value,
-        onChange: this.#createDatetimeChangeHandler('dateTo'),
-        onClose: (_, datetime) => this.#datePickers.dateFrom.set('maxDate', datetime)
+        onChange: this.#createDateChangeHandler('dateTo'),
+        onClose: (_, date) => this.#datePickers.dateFrom.set('maxDate', date)
       }
     );
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#onEditFormSubmit(EventEditItemView.parseStateToEventData(this._state));
+    this.#onFormSubmit(EventFormItemView.parseStateToEventData(this._state));
   };
+
+  #deleteButtonClickHandler = () => this.#onButtonClick(EventFormItemView.parseStateToEventData(this._state));
 
   #eventTypeChangeHandler = (evt) => {
     this.updateElement({
       offers: [],
       type: evt.target.value,
-      typeItem: EventEditItemView.#getTypeItem(this.#data.types, evt.target.value)
+      typeItem: EventFormItemView.#getTypeItem(this.#data.types, evt.target.value)
     });
   };
 
@@ -263,24 +277,28 @@ export default class EventEditItemView extends AbstractStatefulView {
   };
 
   #destinationFieldInputHandler = (evt) => {
-    const newInputValueId = Number(this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`).dataset.destinationId);
-    this.updateElement({
-      destination: newInputValueId,
-      destinationItem: EventEditItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
-    });
+    const destinationListItem = this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`);
+
+    if (destinationListItem) {
+      const newInputValueId = Number(destinationListItem.dataset.destinationId);
+      this.updateElement({
+        destination: newInputValueId,
+        destinationItem: EventFormItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
+      });
+    }
   };
 
-  #createDatetimeChangeHandler = (propertyName) => ([datetime]) => {
+  #createDateChangeHandler = (propertyName) => ([date]) => {
     this._setState({
       ...this._state,
-      [propertyName]: datetime
+      [propertyName]: date
     });
   };
 
   #priceFieldInputHandler = (evt) => {
     this._setState({
       ...this._state,
-      basePrice: evt.target.value
+      basePrice: Number(evt.target.value)
     });
   };
 
