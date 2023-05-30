@@ -1,10 +1,9 @@
-import { RenderPosition, render, remove } from '../../../framework/render';
-import { FilterType, UpdateType, UserAction } from '../../../const';
+import { nanoid } from 'nanoid';
 
 import NewEventButtonView from '../view/new-event-button-view.js';
 import EventFormItemView from '../../event/view/event-form-item-view';
-
-import { nanoid } from 'nanoid';
+import { RenderPosition, render, remove } from '../../../framework/render';
+import { FilterType, UpdateType, UserAction } from '../../../const';
 
 const tripMain = document.querySelector('.trip-main');
 
@@ -16,22 +15,18 @@ export default class NewEventPresenter {
   #boardPresenter = null;
 
   #newEventButtonComponent = null;
-  #eventsBoardListComponent = null;
   #newEventFormComponent = null;
 
-  #onEventUserAction = null;
-
-  constructor({ destinationsModel, typeOffersModel, filtersModel, boardPresenter, eventsBoardListComponent, onEventUserAction }) {
+  constructor({ destinationsModel, typeOffersModel, filtersModel, boardPresenter }) {
     this.#destinationsModel = destinationsModel;
     this.#typeOffersModel = typeOffersModel;
     this.#filtersModel = filtersModel;
     this.#boardPresenter = boardPresenter;
-    this.#eventsBoardListComponent = eventsBoardListComponent;
-    this.#onEventUserAction = onEventUserAction;
   }
 
   init() {
     this.#renderNewEventButton();
+    this.deactivateNewEventButton();
   }
 
   #createNewEvent() {
@@ -42,7 +37,7 @@ export default class NewEventPresenter {
       onButtonClick: this.#onCancelButtonClick
     });
 
-    render(this.#newEventFormComponent, this.#eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
+    render(this.#newEventFormComponent, this.#boardPresenter.eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#onEscKeydownClick);
   }
 
@@ -51,11 +46,19 @@ export default class NewEventPresenter {
       return;
     }
 
-    this.#newEventButtonComponent.element.disabled = false;
+    this.activateNewEventButton();
     document.removeEventListener('keydown', this.#onEscKeydownClick);
 
     remove(this.#newEventFormComponent);
     this.#newEventFormComponent = null;
+  };
+
+  activateNewEventButton = () => {
+    this.#newEventButtonComponent.element.disabled = false;
+  };
+
+  deactivateNewEventButton = () => {
+    this.#newEventButtonComponent.element.disabled = true;
   };
 
   #renderNewEventButton() {
@@ -67,7 +70,7 @@ export default class NewEventPresenter {
 
   #createNewEventBlank() {
     return {
-      basePrice: 0,
+      basePrice: 1,
       dateFrom: new Date(),
       dateTo: new Date(),
       destination: this.#destinationsModel.destinations[0].id,
@@ -81,11 +84,11 @@ export default class NewEventPresenter {
     this.#boardPresenter.setDefaultSortType();
     this.#filtersModel.setCurrentFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#createNewEvent();
-    this.#newEventButtonComponent.element.disabled = true;
+    this.deactivateNewEventButton();
   };
 
   #onNewEventFormSubmit = (newEvent) => {
-    this.#onEventUserAction(
+    this.#boardPresenter.onEventUserAction(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
       { ...newEvent, id: nanoid() }

@@ -1,16 +1,15 @@
-import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
-
-import { capitalizeWord } from '../../../utils/common.js';
-import { DateFormat, convertDate } from '../../../utils/date.js';
-
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+
+import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DateFormat, convertDate } from '../../../utils/date.js';
 
 //* Шаблон разметки пункта назначения
 //* ------------------------------------------------------
 
 const createEventPhotosTemplate = (picturesList) => {
-  if (!picturesList.length) {
+  if (picturesList.length === 0) {
     return '';
   }
 
@@ -55,7 +54,7 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
     </div>`);
 
 const createEventsEditOffersTemplate = (typeItem, eventSelectedOffers) => {
-  if (!typeItem.offers.length) {
+  if (typeItem.offers.length === 0) {
     return '';
   }
 
@@ -151,7 +150,7 @@ const createEventsFormItemTemplate = ({ destinations, types, event }, isNewEvent
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" min="0" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" min="1" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -182,11 +181,11 @@ export default class EventFormItemView extends AbstractStatefulView {
     super();
     this.#data = { destinations, types, event };
     this.#isNewEvent = isNewEvent;
-    this._setState(EventFormItemView.parseEventDataToState(this.#data));
     this.#onFormSubmit = onFormSubmit;
     this.#onButtonClick = onButtonClick;
     this.#onRollupButtonClick = onRollupButtonClick;
 
+    this._setState(EventFormItemView.parseEventDataToState(this.#data));
     this._restoreHandlers();
   }
 
@@ -213,17 +212,15 @@ export default class EventFormItemView extends AbstractStatefulView {
     if (!this.#isNewEvent) {
       this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onRollupButtonClick);
     }
-    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHandler);
-
-    this.element.querySelector('.event__type-list').addEventListener('change', this.#eventTypeChangeHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('click', this.#destinationFieldClickHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationFieldInputHandler);
-    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceFieldInputHandler);
-
     if (this._state.typeItem.offers.length !== 0) {
       this.element.querySelector('.event__available-offers').addEventListener('change', this.#availableOfferChangeHandler);
     }
+
+    this.element.querySelector('.event__type-list').addEventListener('change', this.#eventTypeChangeHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationFieldInputHandler);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceFieldInputHandler);
+    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHandler);
 
     this.#setDateFromPicker();
     this.#setDateToPicker();
@@ -272,15 +269,11 @@ export default class EventFormItemView extends AbstractStatefulView {
     });
   };
 
-  #destinationFieldClickHandler = (evt) => {
-    evt.target.value = null;
-  };
-
   #destinationFieldInputHandler = (evt) => {
     const destinationListItem = this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`);
 
     if (destinationListItem) {
-      const newInputValueId = Number(destinationListItem.dataset.destinationId);
+      const newInputValueId = destinationListItem.dataset.destinationId;
       this.updateElement({
         destination: newInputValueId,
         destinationItem: EventFormItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
@@ -304,7 +297,7 @@ export default class EventFormItemView extends AbstractStatefulView {
 
   #availableOfferChangeHandler = (evt) => {
     const checkedOffers = new Set(this._state.offers);
-    const currentCheckedOfferId = Number(evt.target.dataset.offerId);
+    const currentCheckedOfferId = evt.target.dataset.offerId;
 
     if (checkedOffers.has(currentCheckedOfferId)) {
       checkedOffers.delete(currentCheckedOfferId);
@@ -316,7 +309,6 @@ export default class EventFormItemView extends AbstractStatefulView {
       offers: Array.from(checkedOffers)
     });
   };
-
 
   static parseEventDataToState({ destinations, types, event }) {
     return {

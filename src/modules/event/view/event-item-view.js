@@ -1,12 +1,11 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-
 import { capitalizeWord } from '../../../utils/common.js';
 import { DateFormat, convertDate, getDuration, formatDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
 const createSelectedOffersTemplate = (eventSelectedOffers, typeItem) => {
-  if (!eventSelectedOffers.length) {
+  if (eventSelectedOffers.length === 0) {
     return '';
   }
 

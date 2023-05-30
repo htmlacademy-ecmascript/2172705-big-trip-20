@@ -1,35 +1,52 @@
 import Observable from '../framework/observable.js';
-import { createEventDataset } from '../mock/events.js';
-import { EVENT_COUNT } from '../mock/const.js';
+import { createErrorMessage } from '../utils/api.js';
+import { UpdateType } from '../const.js';
 
 export default class EventsModel extends Observable {
+  #eventsApiService = null;
   #events = [];
 
-  constructor({ typeOffersModel }) {
+  constructor({ eventsApiService }) {
     super();
-    this.#events = createEventDataset(EVENT_COUNT, typeOffersModel.types);
+    this.#eventsApiService = eventsApiService;
+  }
+
+  async init() {
+    try {
+      this.#events = await this.#eventsApiService.getEvents();
+    } catch {
+      throw new Error('Can\'t to load events data from server!');
+    }
+
+    this._notify(UpdateType.INIT);
   }
 
   get events() {
     return this.#events;
   }
 
-  updateEvent(updateType, updatedEvent) {
-    const updatedEventIndex = this.#events.findIndex((event) => event.id === updatedEvent.id);
+  async updateEvent(updateType, eventForUpdate) {
+    const updatedEventIndex = this.#events.findIndex((event) => event.id === eventForUpdate.id);
 
     if (updatedEventIndex === -1) {
-      throw new Error(`Can't update unexisting ${updatedEvent}`);
+      throw new Error(`Can't update unexisting ${eventForUpdate}`);
     }
 
-    this.#events = this.#events.map((event, index) => {
-      if (index === updatedEventIndex) {
-        return updatedEvent;
-      }
+    try {
+      const updatedEvent = await this.#eventsApiService.updateEvent(eventForUpdate);
 
-      return event;
-    });
+      this.#events = this.#events.map((event, index) => {
+        if (index === updatedEventIndex) {
+          return updatedEvent;
+        }
 
-    this._notify(updateType, updatedEvent);
+        return event;
+      });
+
+      this._notify(updateType, updatedEvent);
+    } catch {
+      createErrorMessage('Can\'t to update events data!');
+    }
   }
 
   addEvent(updateType, addedEvent) {

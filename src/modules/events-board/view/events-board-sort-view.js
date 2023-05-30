@@ -1,5 +1,4 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-
 import { capitalizeWord } from '../../../utils/common.js';
 import { SortType } from '../../../const.js';
 

@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 
-import { getRandomInteger } from '../utils/common.js';
-
 dayjs.extend(duration);
 
 const DateFormat = {
@@ -39,24 +37,6 @@ const sortByDurationDesc = (pointA, pointB) => {
 
 const sortByDateFromAsc = (pointA, pointB) => dayjs(pointA.dateFrom).diff(dayjs(pointB.dateFrom));
 
-const getRandomDate = (isDateFrom) => {
-  if (isDateFrom) {
-    return dayjs()
-      .subtract(getRandomInteger(1, 5), 'd')
-      .subtract(getRandomInteger(1, 23), 'h')
-      .subtract(getRandomInteger(1, 59), 'm')
-      .subtract(getRandomInteger(1, 59), 's')
-      .toDate();
-  }
-
-  return dayjs()
-    .add(getRandomInteger(1, 5), 'd')
-    .add(getRandomInteger(1, 23), 'h')
-    .add(getRandomInteger(1, 59), 'm')
-    .add(getRandomInteger(1, 59), 's')
-    .toDate();
-};
-
 const isDateFuture = (dateFrom) => dayjs().isBefore(dateFrom);
 
 const isDatePresent = (dateFrom, dateTo) => dayjs().isAfter(dateFrom) && dayjs().isBefore(dateTo);
@@ -77,7 +57,6 @@ export {
   formatDuration,
   sortByDurationDesc,
   sortByDateFromAsc,
-  getRandomDate,
   isDateFuture,
   isDatePast,
   isDatePresent,

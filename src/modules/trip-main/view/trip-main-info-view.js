@@ -23,7 +23,7 @@ const getTitle = ({ destinations, events }) => {
 //* ------------------------------------------------------
 
 const getTripDates = ({ events }) => {
-  if (!events.length) {
+  if (events.length === 0) {
     return '';
   }
 
@@ -44,7 +44,7 @@ const getTripDates = ({ events }) => {
 //* ------------------------------------------------------
 
 const calculateTotalCost = ({ types, events }) => {
-  if (!events.length) {
+  if (events.length === 0) {
     return 0;
   }
 
