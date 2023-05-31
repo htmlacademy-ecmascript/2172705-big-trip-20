@@ -1,50 +1,50 @@
+import EventPresenter from '../../event/presenter/event-presenter.js';
+import EventsBoardSortView from '../view/events-board-sort-view.js';
+import EventsBoardListView from '../view/events-board-list-view.js';
+import EventsBoardMessageView from '../view/events-board-message-view.js';
+
 import { RenderPosition, remove, render } from '../../../framework/render.js';
 import { sortByDurationDesc, sortByDateFromAsc } from '../../../utils/date.js';
 import { filterEventsBy } from '../../../utils/filters.js';
 import { sortByDesc } from '../../../utils/common.js';
 import { SortType, UpdateType, UserAction } from '../../../const.js';
 
-import EventsBoardSortView from '../view/events-board-sort-view.js';
-import EventsBoardListView from '../view/events-board-list-view.js';
-import EventsBoardMessageView from '../view/events-board-message-view.js';
-
-import EventPresenter from '../../event/presenter/event-presenter.js';
-import NewEventPresenter from '../../new-event/presenter/new-event-presenter.js';
-
 const tripEvents = document.querySelector('.trip-events');
 
 export default class EventsBoardPresenter {
   #destinationsModel = null;
-  #typeOffersModel = null;
+  #offerTypesModel = null;
   #eventsModel = null;
   #filtersModel = null;
 
-  #eventsBoardMessageComponent = null;
   #eventsBoardSortComponent = null;
-  #eventsBoardListComponent = new EventsBoardListView();
+  #eventsBoardMessageComponent = null;
+  eventsBoardListComponent = new EventsBoardListView();
 
   #eventPresenters = new Map();
   #newEventPresenter = null;
 
-  #currentSortType = SortType.DAY;
   #defaultSortType = SortType.DAY;
+  #currentSortType = this.#defaultSortType;
 
-  constructor({ destinationsModel, typeOffersModel, eventsModel, filtersModel }) {
+  #isLoading = true;
+
+  constructor({ destinationsModel, offerTypesModel, eventsModel, filtersModel }) {
     this.#destinationsModel = destinationsModel;
-    this.#typeOffersModel = typeOffersModel;
+    this.#offerTypesModel = offerTypesModel;
     this.#eventsModel = eventsModel;
     this.#filtersModel = filtersModel;
 
-    this.#eventsModel.addObserver(this.#onEventModelChange);
-    this.#filtersModel.addObserver(this.#onEventModelChange);
+    this.#eventsModel.addObserver(this.#onModelChange);
+    this.#filtersModel.addObserver(this.#onModelChange);
   }
 
   get destinations() {
     return this.#destinationsModel.destinations;
   }
 
-  get types() {
-    return this.#typeOffersModel.types;
+  get offerTypes() {
+    return this.#offerTypesModel.offerTypes;
   }
 
   get events() {
@@ -63,24 +63,42 @@ export default class EventsBoardPresenter {
     }
   }
 
-  setDefaultSortType() {
-    this.#currentSortType = { ...this.#defaultSortType };
+  init({ newEventPresenter }) {
+    this.#renderEventsBoard();
+    this.#newEventPresenter = newEventPresenter;
   }
 
-  init() {
-    this.#renderEventsBoard();
-    this.#renderNewEventButton();
+  setDefaultSortType() {
+    this.#currentSortType = this.#defaultSortType;
   }
 
   #renderEventsBoard() {
     this.#renderEventsBoardList();
 
-    if (!this.events.length) {
-      this.#renderEventsBoardMessage({ currentFilter: this.#filtersModel.currentFilter });
+    if (this.#isLoading) {
+      this.renderEventsBoardMessage({ message: 'Loading...' });
+      return;
+    }
+
+    if (this.events.length === 0) {
+      this.renderEventsBoardMessage({ currentFilter: this.#filtersModel.currentFilter });
       return;
     }
 
     this.#renderEventsBoardSort();
+  }
+
+  #clearEventsBoard({ resetSortType = false } = {}) {
+    this.#eventPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventPresenters.clear();
+
+    remove(this.#eventsBoardSortComponent);
+    remove(this.eventsBoardListComponent);
+    remove(this.#eventsBoardMessageComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = this.#defaultSortType;
+    }
   }
 
   #renderEventsBoardSort() {
@@ -89,57 +107,32 @@ export default class EventsBoardPresenter {
       onSortTypeChange: this.#onSortTypeChange
     });
 
-    render(this.#eventsBoardSortComponent, this.#eventsBoardListComponent.element, RenderPosition.BEFOREBEGIN);
+    render(this.#eventsBoardSortComponent, this.eventsBoardListComponent.element, RenderPosition.BEFOREBEGIN);
   }
 
   #renderEventsBoardList() {
-    render(this.#eventsBoardListComponent, tripEvents);
-    this.events.forEach((event) => this.#renderEventsBoardItem({ destinations: this.destinations, types: this.types, event }));
+    render(this.eventsBoardListComponent, tripEvents);
+    this.events.forEach((event) => this.#renderEventsBoardItem({ destinations: this.destinations, offerTypes: this.offerTypes, event }));
   }
 
-  #renderEventsBoardItem({ destinations, types, event }) {
+  #renderEventsBoardItem({ destinations, offerTypes, event }) {
     const eventsBoardItemPresenter = new EventPresenter({
-      eventsListContainer: this.#eventsBoardListComponent,
-      onEventUserAction: this.#onEventUserAction,
+      eventsListContainer: this.eventsBoardListComponent,
+      onEventUserAction: this.onEventUserAction,
       onEventModeChange: this.#onEventModeChange
     });
 
-    eventsBoardItemPresenter.init({ destinations, types, event });
+    eventsBoardItemPresenter.init({ destinations, offerTypes, event });
     this.#eventPresenters.set(event.id, eventsBoardItemPresenter);
   }
 
-  #renderEventsBoardMessage({ message, currentFilter }) {
+  renderEventsBoardMessage({ message, currentFilter }) {
+    this.#clearEventsBoard();
     this.#eventsBoardMessageComponent = new EventsBoardMessageView({ message, currentFilter });
     render(this.#eventsBoardMessageComponent, tripEvents);
   }
 
-  #renderNewEventButton() {
-    this.#newEventPresenter = new NewEventPresenter({
-      destinationsModel: this.#destinationsModel,
-      typeOffersModel: this.#typeOffersModel,
-      filtersModel: this.#filtersModel,
-      boardPresenter: this,
-      eventsBoardListComponent: this.#eventsBoardListComponent,
-      onEventUserAction: this.#onEventUserAction
-    });
-
-    this.#newEventPresenter.init();
-  }
-
-  #clearEventsBoard({ resetSortType = false } = {}) {
-    this.#eventPresenters.forEach((presenter) => presenter.destroy());
-    this.#eventPresenters.clear();
-
-    remove(this.#eventsBoardSortComponent);
-    remove(this.#eventsBoardListComponent);
-    remove(this.#eventsBoardMessageComponent);
-
-    if (resetSortType) {
-      this.#currentSortType = this.#defaultSortType;
-    }
-  }
-
-  #onEventUserAction = (actionType, updateType, updatedEvent) => {
+  onEventUserAction = (actionType, updateType, updatedEvent) => {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#eventsModel.updateEvent(updateType, updatedEvent);
@@ -155,10 +148,10 @@ export default class EventsBoardPresenter {
     }
   };
 
-  #onEventModelChange = (updateType, updatedEvent) => {
+  #onModelChange = (updateType, updatedEvent) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#eventPresenters.get(updatedEvent.id).init({ destinations: this.destinations, types: this.types, event: updatedEvent });
+        this.#eventPresenters.get(updatedEvent.id).init({ destinations: this.destinations, offerTypes: this.offerTypes, event: updatedEvent });
         break;
       case UpdateType.MINOR:
         this.#clearEventsBoard();
@@ -168,6 +161,15 @@ export default class EventsBoardPresenter {
         this.#clearEventsBoard({ resetSortType: true });
         this.#renderEventsBoard();
         break;
+      case UpdateType.INIT:
+        try {
+          this.#isLoading = false;
+          this.#clearEventsBoard();
+          this.#renderEventsBoard();
+          break;
+        } catch {
+          throw new Error('Critical Web application initialization error!');
+        }
       default:
         throw new Error(`No implementation of model change processing with the change type was found ${updateType}`);
     }

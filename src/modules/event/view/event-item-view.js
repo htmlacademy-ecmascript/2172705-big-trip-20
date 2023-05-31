@@ -1,19 +1,18 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
-
 import { capitalizeWord } from '../../../utils/common.js';
 import { DateFormat, convertDate, getDuration, formatDuration } from '../../../utils/date.js';
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
-const createSelectedOffersTemplate = (eventSelectedOffers, typeItem) => {
-  if (!eventSelectedOffers.length) {
+const createSelectedOffersTemplate = (eventSelectedOffers, offerTypes) => {
+  if (eventSelectedOffers.length === 0) {
     return '';
   }
 
   return (/*html*/`
     <ul class="event__selected-offers">
       ${eventSelectedOffers.map((id) => {
-      const offerItem = typeItem.offers.find((offer) => offer.id === id);
+      const offerItem = offerTypes.offers.find((offer) => offer.id === id);
 
       return (/*html*/`
         <li class="event__offer">
@@ -25,11 +24,11 @@ const createSelectedOffersTemplate = (eventSelectedOffers, typeItem) => {
     </ul>`);
 };
 
-const createEventsItemTemplate = ({ destinations, types, event }) => {
+const createEventsItemTemplate = ({ destinations, offerTypes, event }) => {
   const { type: eventType, destination: destinationId, offers: eventSelectedOffers, basePrice, isFavorite, dateFrom, dateTo } = event;
 
   const destinationItem = destinations.find((destination) => destination.id === destinationId);
-  const typeItem = types.find((type) => type.type === eventType);
+  const offerTypeItem = offerTypes.find((type) => type.type === eventType);
 
   return (/*html*/`
     <li class="trip-events__item">
@@ -51,7 +50,7 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
-        ${createSelectedOffersTemplate(eventSelectedOffers, typeItem)}
+        ${createSelectedOffersTemplate(eventSelectedOffers, offerTypeItem)}
         <button class="event__favorite-btn ${isEventFavorite(isFavorite)}" type="button">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -68,9 +67,9 @@ const createEventsItemTemplate = ({ destinations, types, event }) => {
 export default class EventItemView extends AbstractView {
   #data = {};
 
-  constructor({ data: { destinations, types, event }, onRollupButtonClick, onFavoriteButtonClick }) {
+  constructor({ data: { destinations, offerTypes, event }, onRollupButtonClick, onFavoriteButtonClick }) {
     super();
-    this.#data = { destinations, types, event };
+    this.#data = { destinations, offerTypes, event };
     this.element.querySelector('.event__rollup-btn').addEventListener('click', onRollupButtonClick);
     this.element.querySelector('.event__favorite-btn').addEventListener('click', onFavoriteButtonClick);
   }

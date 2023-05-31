@@ -1,4 +1,25 @@
 const MAX_DISPLAYED_DESTINATIONS = 3;
+const END_POINT = 'https://20.objects.pages.academy/big-trip';
+const ERROR_MESSAGE_SHOW_TIME = 5000;
+
+const HTTPMethod = {
+  GET: 'GET',
+  PUT: 'PUT'
+};
+
+const FilterType = {
+  EVERYTHING: 'EVERYTHING',
+  FUTURE: 'FUTURE',
+  PRESENT: 'PRESENT',
+  PAST: 'PAST'
+};
+
+const EmptyFilterMessage = {
+  [FilterType.EVERYTHING]: 'Click "New Event" to create your first point',
+  [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.PRESENT]: 'There are no present events now',
+  [FilterType.PAST]: 'There are no past events now'
+};
 
 const SortType = {
   DAY: {
@@ -23,20 +44,6 @@ const SortType = {
   }
 };
 
-const FilterType = {
-  EVERYTHING: 'EVERYTHING',
-  FUTURE: 'FUTURE',
-  PRESENT: 'PRESENT',
-  PAST: 'PAST'
-};
-
-const EmptyEventsListFilterMessage = {
-  [FilterType.EVERYTHING]: 'Click "New Event" to create your first point',
-  [FilterType.FUTURE]: 'There are no future events now',
-  [FilterType.PRESENT]: 'There are no present events now',
-  [FilterType.PAST]: 'There are no past events now'
-};
-
 const EventMode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING'
@@ -51,7 +58,8 @@ const UserAction = {
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
-  MAJOR: 'MAJOR'
+  MAJOR: 'MAJOR',
+  INIT: 'INIT'
 };
 
-export { MAX_DISPLAYED_DESTINATIONS, SortType, FilterType, EmptyEventsListFilterMessage, EventMode, UserAction, UpdateType };
+export { MAX_DISPLAYED_DESTINATIONS, END_POINT, ERROR_MESSAGE_SHOW_TIME, HTTPMethod, SortType, FilterType, EmptyFilterMessage, EventMode, UserAction, UpdateType };

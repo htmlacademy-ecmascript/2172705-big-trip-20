@@ -1,16 +1,15 @@
-import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
-
-import { capitalizeWord } from '../../../utils/common.js';
-import { DateFormat, convertDate } from '../../../utils/date.js';
-
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+
+import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
+import { capitalizeWord } from '../../../utils/common.js';
+import { DateFormat, convertDate } from '../../../utils/date.js';
 
 //* Шаблон разметки пункта назначения
 //* ------------------------------------------------------
 
 const createEventPhotosTemplate = (picturesList) => {
-  if (!picturesList.length) {
+  if (picturesList.length === 0) {
     return '';
   }
 
@@ -54,15 +53,15 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
         </div>`)).join('')}
     </div>`);
 
-const createEventsEditOffersTemplate = (typeItem, eventSelectedOffers) => {
-  if (!typeItem.offers.length) {
+const createEventsEditOffersTemplate = (offerTypes, eventSelectedOffers) => {
+  if (offerTypes.offers.length === 0) {
     return '';
   }
 
   return (/*html*/`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-      ${createOffersListTemplate(typeItem.offers, eventSelectedOffers)}
+      ${createOffersListTemplate(offerTypes.offers, eventSelectedOffers)}
     </section>`);
 };
 
@@ -77,11 +76,11 @@ const createDestinationListTemplate = ({ destinations, event }) => (/*html*/`
 //* Шаблон разметки выбора типа события
 //* ------------------------------------------------------
 
-const createEventTypeListTemplate = ({ types, event }) => (/*html*/`
+const createEventTypeListTemplate = ({ offerTypes, event }) => (/*html*/`
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${types.map((type) => (/*html*/`
+        ${offerTypes.map((type) => (/*html*/`
           <div class="event__type-item">
             <input
               id="event-type-${type.type}-${event.id}"
@@ -107,8 +106,8 @@ const createButtonsTemplate = (isNewEvent) => isNewEvent
       <span class="visually-hidden">Open event</span>
     </button>`);
 
-const createEventsFormItemTemplate = ({ destinations, types, event }, isNewEvent) => {
-  const { type: eventType, offers: eventSelectedOffers, basePrice, typeItem, destinationItem, id: eventId, dateFrom, dateTo } = event;
+const createEventsFormItemTemplate = ({ destinations, offerTypes, event }, isNewEvent) => {
+  const { type: eventType, offers: eventSelectedOffers, basePrice, offerTypeItem, destinationItem, id: eventId, dateFrom, dateTo } = event;
 
   return (/*html*/`
     <li class="trip-events__item">
@@ -120,7 +119,7 @@ const createEventsFormItemTemplate = ({ destinations, types, event }, isNewEvent
               <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType}.png" alt="Event type icon.">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-${eventId}" type="checkbox">
-            ${createEventTypeListTemplate({ types, event })}
+            ${createEventTypeListTemplate({ offerTypes, event })}
           </div>
 
           <div class="event__field-group  event__field-group--destination">
@@ -151,14 +150,14 @@ const createEventsFormItemTemplate = ({ destinations, types, event }, isNewEvent
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" min="0" name="event-price" value="${basePrice}">
+            <input class="event__input  event__input--price" id="event-price-${eventId}" type="number" min="1" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           ${createButtonsTemplate(isNewEvent)}
         </header>
         <section class="event__details">
-          ${createEventsEditOffersTemplate(typeItem, eventSelectedOffers)}
+          ${createEventsEditOffersTemplate(offerTypeItem, eventSelectedOffers)}
           ${createEventsEditDestinationTemplate(destinationItem)}
         </section>
       </form>
@@ -178,15 +177,15 @@ export default class EventFormItemView extends AbstractStatefulView {
     dateTo: null
   };
 
-  constructor({ data: { destinations, types, event }, onFormSubmit, onButtonClick, onRollupButtonClick, isNewEvent = false }) {
+  constructor({ data: { destinations, offerTypes, event }, onFormSubmit, onButtonClick, onRollupButtonClick, isNewEvent = false }) {
     super();
-    this.#data = { destinations, types, event };
+    this.#data = { destinations, offerTypes, event };
     this.#isNewEvent = isNewEvent;
-    this._setState(EventFormItemView.parseEventDataToState(this.#data));
     this.#onFormSubmit = onFormSubmit;
     this.#onButtonClick = onButtonClick;
     this.#onRollupButtonClick = onRollupButtonClick;
 
+    this._setState(EventFormItemView.parseEventDataToState(this.#data));
     this._restoreHandlers();
   }
 
@@ -213,17 +212,16 @@ export default class EventFormItemView extends AbstractStatefulView {
     if (!this.#isNewEvent) {
       this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onRollupButtonClick);
     }
-    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHandler);
 
-    this.element.querySelector('.event__type-list').addEventListener('change', this.#eventTypeChangeHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('click', this.#destinationFieldClickHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationFieldInputHandler);
-    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceFieldInputHandler);
-
-    if (this._state.typeItem.offers.length !== 0) {
+    if (this._state.offerTypeItem.offers.length !== 0) {
       this.element.querySelector('.event__available-offers').addEventListener('change', this.#availableOfferChangeHandler);
     }
+
+    this.element.querySelector('.event__type-list').addEventListener('change', this.#eventTypeChangeHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationFieldInputHandler);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceFieldInputHandler);
+    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHandler);
 
     this.#setDateFromPicker();
     this.#setDateToPicker();
@@ -268,19 +266,15 @@ export default class EventFormItemView extends AbstractStatefulView {
     this.updateElement({
       offers: [],
       type: evt.target.value,
-      typeItem: EventFormItemView.#getTypeItem(this.#data.types, evt.target.value)
+      offerTypeItem: EventFormItemView.#getOfferTypeItem(this.#data.offerTypes, evt.target.value)
     });
-  };
-
-  #destinationFieldClickHandler = (evt) => {
-    evt.target.value = null;
   };
 
   #destinationFieldInputHandler = (evt) => {
     const destinationListItem = this.element.querySelector(`#destination-list-${evt.target.dataset.eventId} [value='${evt.target.value}']`);
 
     if (destinationListItem) {
-      const newInputValueId = Number(destinationListItem.dataset.destinationId);
+      const newInputValueId = destinationListItem.dataset.destinationId;
       this.updateElement({
         destination: newInputValueId,
         destinationItem: EventFormItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
@@ -304,7 +298,7 @@ export default class EventFormItemView extends AbstractStatefulView {
 
   #availableOfferChangeHandler = (evt) => {
     const checkedOffers = new Set(this._state.offers);
-    const currentCheckedOfferId = Number(evt.target.dataset.offerId);
+    const currentCheckedOfferId = evt.target.dataset.offerId;
 
     if (checkedOffers.has(currentCheckedOfferId)) {
       checkedOffers.delete(currentCheckedOfferId);
@@ -312,16 +306,16 @@ export default class EventFormItemView extends AbstractStatefulView {
       checkedOffers.add(currentCheckedOfferId);
     }
 
-    this.updateElement({
+    this._setState({
+      ...this._state,
       offers: Array.from(checkedOffers)
     });
   };
 
-
-  static parseEventDataToState({ destinations, types, event }) {
+  static parseEventDataToState({ destinations, offerTypes, event }) {
     return {
       ...event,
-      typeItem: this.#getTypeItem(types, event.type),
+      offerTypeItem: this.#getOfferTypeItem(offerTypes, event.type),
       destinationItem: this.#getDestinationItem(destinations, event.destination)
     };
   }
@@ -329,14 +323,14 @@ export default class EventFormItemView extends AbstractStatefulView {
   static parseStateToEventData(state) {
     const event = { ...state };
 
-    delete event.typeItem;
+    delete event.offerTypeItem;
     delete event.destinationItem;
 
     return event;
   }
 
-  static #getTypeItem(types, eventType) {
-    return types.find((type) => type.type === eventType);
+  static #getOfferTypeItem(offerTypes, eventType) {
+    return offerTypes.find((type) => type.type === eventType);
   }
 
   static #getDestinationItem(destinations, eventDestinationId) {

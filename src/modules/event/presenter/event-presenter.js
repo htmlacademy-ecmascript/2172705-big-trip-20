@@ -1,9 +1,8 @@
+import EventItemView from '../view/event-item-view.js';
+import EventFormItemView from '../view/event-form-item-view.js';
 import { render, replace, remove } from '../../../framework/render.js';
 import { isSameDate } from '../../../utils/date.js';
 import { EventMode, UserAction, UpdateType } from '../../../const.js';
-
-import EventItemView from '../view/event-item-view.js';
-import EventFormItemView from '../view/event-form-item-view.js';
 
 export default class EventPresenter {
   #data = {};
@@ -23,8 +22,8 @@ export default class EventPresenter {
     this.#onEventUserAction = onEventUserAction;
   }
 
-  init({ destinations, types, event }) {
-    this.#data = { destinations, types, event };
+  init({ destinations, offerTypes, event }) {
+    this.#data = { destinations, offerTypes, event };
 
     const prevEventItemComponent = this.#eventItem;
     const prevEventEditItemComponent = this.#eventFormItem;
