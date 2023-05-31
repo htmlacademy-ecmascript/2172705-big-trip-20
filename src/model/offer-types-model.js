@@ -1,14 +1,14 @@
 export default class OfferTypesModel {
   #offerTypes = [];
-  #serverApiService = null;
+  #serverDataApiService = null;
 
-  constructor({ serverApiService }) {
-    this.#serverApiService = serverApiService;
+  constructor({ serverDataApiService }) {
+    this.#serverDataApiService = serverDataApiService;
   }
 
   async init() {
     try {
-      this.#offerTypes = await this.#serverApiService.getOfferTypes();
+      this.#offerTypes = await this.#serverDataApiService.getOfferTypes();
     } catch {
       throw new Error('Can\'t to load offer types data from server!');
     }

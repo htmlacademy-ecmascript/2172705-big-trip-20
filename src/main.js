@@ -3,7 +3,7 @@ import { END_POINT } from './const.js';
 
 const authToken = generateAuthToken();
 
-import ServerApiService from './api/server-api-service.js';
+import ServerDataApiService from './api/server-data-api-service.js';
 
 import DestinationsModel from './model/destinations-model.js';
 import OfferTypesModel from './model/offer-types-model.js';
@@ -15,9 +15,9 @@ import FiltersPresenter from './modules/filters/presenter/filters-presenter.js';
 import NewEventPresenter from './modules/new-event/presenter/new-event-presenter.js';
 import EventsBoardPresenter from './modules/events-board/presenter/events-board-presenter.js';
 
-const destinationsModel = new DestinationsModel({ serverApiService: new ServerApiService(END_POINT, authToken) });
-const offerTypesModel = new OfferTypesModel({ serverApiService: new ServerApiService(END_POINT, authToken) });
-const eventsModel = new EventsModel({ serverApiService: new ServerApiService(END_POINT, authToken) });
+const destinationsModel = new DestinationsModel({ serverDataApiService: new ServerDataApiService(END_POINT, authToken) });
+const offerTypesModel = new OfferTypesModel({ serverDataApiService: new ServerDataApiService(END_POINT, authToken) });
+const eventsModel = new EventsModel({ serverDataApiService: new ServerDataApiService(END_POINT, authToken) });
 const filtersModel = new FiltersModel();
 
 const tripMainPresenter = new TripMainPresenter({ destinationsModel, offerTypesModel, eventsModel });

@@ -1,7 +1,7 @@
 import ApiService from '../framework/api-service.js';
 import { HTTPMethod } from '../const.js';
 
-export default class ServerApiService extends ApiService {
+export default class ServerDataApiService extends ApiService {
   async getDestinations() {
     const response = await this._load({ url: 'destinations' });
     const parsedResponse = await ApiService.parseResponse(response);
