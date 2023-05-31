@@ -1,7 +1,21 @@
 import ApiService from '../framework/api-service.js';
 import { HTTPMethod } from '../const.js';
 
-export default class EventsApiService extends ApiService {
+export default class ServerApiService extends ApiService {
+  async getDestinations() {
+    const response = await this._load({ url: 'destinations' });
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  }
+
+  async getOfferTypes() {
+    const response = await this._load({ url: 'offers' });
+    const parsedResponse = await ApiService.parseResponse(response);
+
+    return parsedResponse;
+  }
+
   async getEvents() {
     const response = await this._load({ url: 'points' });
     const parsedResponse = await ApiService.parseResponse(response);

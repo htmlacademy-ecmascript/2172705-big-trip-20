@@ -18,7 +18,6 @@ const getTitle = ({ destinations, events }) => {
   return `${destinationNamesList[0]}&nbsp;&mdash;&nbsp;...&nbsp;&mdash;&nbsp;${destinationNamesList.at(-1)}`;
 };
 
-
 //* Определение дат начала и конца путешествия
 //* ------------------------------------------------------
 
@@ -29,7 +28,6 @@ const getTripDates = ({ events }) => {
 
   const firstEventSortedByDateTo = events.sort(sortByAsc('dateFrom')).at(0);
   const lastEventSortedByDateTo = events.sort(sortByAsc('dateTo')).at(-1);
-
   const formattedDateFrom = convertDate(firstEventSortedByDateTo.dateFrom, DateFormat.EVENT_DATE);
   let formattedDateTo = convertDate(lastEventSortedByDateTo.dateTo, DateFormat.EVENT_DATE);
 
@@ -43,14 +41,14 @@ const getTripDates = ({ events }) => {
 //* Подсчет итоговой стоимости
 //* ------------------------------------------------------
 
-const calculateTotalCost = ({ types, events }) => {
+const calculateTotalCost = ({ offerTypes, events }) => {
   if (events.length === 0) {
     return 0;
   }
 
   const totalCost = events.reduce((result, event) => {
     let offersCost = 0;
-    const { offers } = types.find((type) => type.type === event.type);
+    const { offers } = offerTypes.find((type) => type.type === event.type);
 
     if (offers.length !== 0 && event.offers !== 0) {
       offersCost = offers.reduce((accum, offer) => {
@@ -68,24 +66,24 @@ const calculateTotalCost = ({ types, events }) => {
   return totalCost;
 };
 
-const createTripMainInfoTemplate = ({ destinations, types, events }) => (/*html*/`
+const createTripMainInfoTemplate = ({ destinations, offerTypes, events }) => (/*html*/`
   <section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
-      <h1 class="trip-info__title">${getTitle({ destinations, types, events })}</h1>
+      <h1 class="trip-info__title">${getTitle({ destinations, offerTypes, events })}</h1>
       <p class="trip-info__dates">${getTripDates({ events })}</p>
     </div>
 
     <p class="trip-info__cost">
-      Total: &euro;&nbsp;<span class="trip-info__cost-value">${calculateTotalCost({ types, events })}</span>
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">${calculateTotalCost({ offerTypes, events })}</span>
     </p>
   </section>`);
 
 export default class TripMainInfoView extends AbstractView {
   #data = {};
 
-  constructor({ destinations, types, events }) {
+  constructor({ destinations, offerTypes, events }) {
     super();
-    this.#data = { destinations, types, events };
+    this.#data = { destinations, offerTypes, events };
   }
 
   get template() {

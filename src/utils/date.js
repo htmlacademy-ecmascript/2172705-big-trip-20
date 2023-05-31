@@ -21,6 +21,7 @@ const formatDuration = (durationValue) => {
   if (durationValue.get('day')) {
     return durationValue.format(DateFormat.D_H_M_DURATION);
   }
+
   if (!durationValue.get('day') && durationValue.get('hour')) {
     return durationValue.format(DateFormat.H_M_DURATION);
   }

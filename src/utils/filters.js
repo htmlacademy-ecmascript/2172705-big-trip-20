@@ -26,9 +26,11 @@ const generateFilters = (events) => events.reduce((result, event) => {
   if (isDateFuture(event.dateFrom)) {
     result[FilterType.FUTURE]++;
   }
+
   if (isDatePast(event.dateTo)) {
     result[FilterType.PAST]++;
   }
+
   if (isDatePresent(event.dateFrom, event.dateTo)) {
     result[FilterType.PRESENT]++;
   }

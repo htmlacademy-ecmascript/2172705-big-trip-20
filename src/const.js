@@ -14,7 +14,7 @@ const FilterType = {
   PAST: 'PAST'
 };
 
-const EmptyEventsListFilterMessage = {
+const EmptyFilterMessage = {
   [FilterType.EVERYTHING]: 'Click "New Event" to create your first point',
   [FilterType.FUTURE]: 'There are no future events now',
   [FilterType.PRESENT]: 'There are no present events now',
@@ -62,4 +62,4 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-export { MAX_DISPLAYED_DESTINATIONS, END_POINT, ERROR_MESSAGE_SHOW_TIME, HTTPMethod, SortType, FilterType, EmptyEventsListFilterMessage, EventMode, UserAction, UpdateType };
+export { MAX_DISPLAYED_DESTINATIONS, END_POINT, ERROR_MESSAGE_SHOW_TIME, HTTPMethod, SortType, FilterType, EmptyFilterMessage, EventMode, UserAction, UpdateType };

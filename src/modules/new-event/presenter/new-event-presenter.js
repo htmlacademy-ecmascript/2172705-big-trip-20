@@ -9,7 +9,7 @@ const tripMain = document.querySelector('.trip-main');
 
 export default class NewEventPresenter {
   #destinationsModel = null;
-  #typeOffersModel = null;
+  #offerTypesModel = null;
   #filtersModel = null;
 
   #boardPresenter = null;
@@ -17,9 +17,9 @@ export default class NewEventPresenter {
   #newEventButtonComponent = null;
   #newEventFormComponent = null;
 
-  constructor({ destinationsModel, typeOffersModel, filtersModel, boardPresenter }) {
+  constructor({ destinationsModel, offerTypesModel, filtersModel, boardPresenter }) {
     this.#destinationsModel = destinationsModel;
-    this.#typeOffersModel = typeOffersModel;
+    this.#offerTypesModel = offerTypesModel;
     this.#filtersModel = filtersModel;
     this.#boardPresenter = boardPresenter;
   }
@@ -31,7 +31,7 @@ export default class NewEventPresenter {
 
   #createNewEvent() {
     this.#newEventFormComponent = new EventFormItemView({
-      data: { destinations: this.#destinationsModel.destinations, types: this.#typeOffersModel.types, event: this.#createNewEventBlank() },
+      data: { destinations: this.#destinationsModel.destinations, offerTypes: this.#offerTypesModel.offerTypes, event: this.#createNewEventBlank() },
       isNewEvent: true,
       onFormSubmit: this.#onNewEventFormSubmit,
       onButtonClick: this.#onCancelButtonClick
@@ -76,7 +76,7 @@ export default class NewEventPresenter {
       destination: this.#destinationsModel.destinations[0].id,
       isFavorite: false,
       offers: [],
-      type: this.#typeOffersModel.types[0].type
+      type: this.#offerTypesModel.offerTypes[0].type
     };
   }
 

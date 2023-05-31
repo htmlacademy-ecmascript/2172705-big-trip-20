@@ -5,14 +5,14 @@ const tripMainContainer = document.querySelector('.trip-main');
 
 export default class TripMainPresenter {
   #destinationsModel = null;
-  #typeOffersModel = null;
+  #offerTypesModel = null;
   #eventsModel = null;
 
   #tripMainInfoComponent = null;
 
-  constructor({ destinationsModel, typeOffersModel, eventsModel }) {
+  constructor({ destinationsModel, offerTypesModel, eventsModel }) {
     this.#destinationsModel = destinationsModel;
-    this.#typeOffersModel = typeOffersModel;
+    this.#offerTypesModel = offerTypesModel;
     this.#eventsModel = eventsModel;
 
     this.#eventsModel.addObserver(this.#onModelChange);
@@ -22,7 +22,7 @@ export default class TripMainPresenter {
     const prevTripMainInfoComponent = this.#tripMainInfoComponent;
     this.#tripMainInfoComponent = new TripMainInfoView({
       destinations: this.#destinationsModel.destinations,
-      types: this.#typeOffersModel.types,
+      offerTypes: this.#offerTypesModel.offerTypes,
       events: this.#eventsModel.events
     });
 

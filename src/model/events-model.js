@@ -1,19 +1,18 @@
 import Observable from '../framework/observable.js';
-import { createErrorMessage } from '../utils/api.js';
 import { UpdateType } from '../const.js';
 
 export default class EventsModel extends Observable {
-  #eventsApiService = null;
+  #serverApiService = null;
   #events = [];
 
-  constructor({ eventsApiService }) {
+  constructor({ serverApiService }) {
     super();
-    this.#eventsApiService = eventsApiService;
+    this.#serverApiService = serverApiService;
   }
 
   async init() {
     try {
-      this.#events = await this.#eventsApiService.getEvents();
+      this.#events = await this.#serverApiService.getEvents();
     } catch {
       throw new Error('Can\'t to load events data from server!');
     }
@@ -33,19 +32,11 @@ export default class EventsModel extends Observable {
     }
 
     try {
-      const updatedEvent = await this.#eventsApiService.updateEvent(eventForUpdate);
-
-      this.#events = this.#events.map((event, index) => {
-        if (index === updatedEventIndex) {
-          return updatedEvent;
-        }
-
-        return event;
-      });
-
+      const updatedEvent = await this.#serverApiService.updateEvent(eventForUpdate);
+      this.#events = this.#events.map((event, index) => index === updatedEventIndex ? updatedEvent : event);
       this._notify(updateType, updatedEvent);
     } catch {
-      createErrorMessage('Can\'t to update events data!');
+      throw new Error('Can\'t to update events data!');
     }
   }
 
@@ -66,7 +57,6 @@ export default class EventsModel extends Observable {
     }
 
     this.#events = this.#events.filter((event) => event.id !== deletedEvent.id);
-
     this._notify(updateType);
   }
 }

@@ -22,8 +22,8 @@ export default class EventPresenter {
     this.#onEventUserAction = onEventUserAction;
   }
 
-  init({ destinations, types, event }) {
-    this.#data = { destinations, types, event };
+  init({ destinations, offerTypes, event }) {
+    this.#data = { destinations, offerTypes, event };
 
     const prevEventItemComponent = this.#eventItem;
     const prevEventEditItemComponent = this.#eventFormItem;

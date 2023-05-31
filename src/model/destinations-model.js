@@ -1,14 +1,14 @@
 export default class DestinationsModel {
   #destinations = [];
-  #destinationsApiService = null;
+  #serverApiService = null;
 
-  constructor({ destinationsApiService }) {
-    this.#destinationsApiService = destinationsApiService;
+  constructor({ serverApiService }) {
+    this.#serverApiService = serverApiService;
   }
 
   async init() {
     try {
-      this.#destinations = await this.#destinationsApiService.getDestinations();
+      this.#destinations = await this.#serverApiService.getDestinations();
     } catch {
       throw new Error('Can\'t to load destinations data from server!');
     }
