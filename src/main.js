@@ -39,4 +39,3 @@ Promise.all([destinationsModel.init(), offerTypesModel.init()])
   .then(() => eventsModel.init())
   .catch(((error) => eventsBoardPresenter.renderEventsBoardMessage({ message: error.message })))
   .finally(() => newEventPresenter.activateNewEventButton());
-

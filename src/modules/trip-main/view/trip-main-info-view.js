@@ -6,10 +6,8 @@ import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
 //* Определение наименования маршрута
 //* ------------------------------------------------------
 
-const getDestinationItem = (destinations, eventItem) => destinations.find((item) => item.id === eventItem.destination);
-
 const getTitle = ({ destinations, events }) => {
-  const destinationNamesList = events.map((event) => getDestinationItem(destinations, event).name);
+  const destinationNamesList = events.map((event) => destinations.get(event.destination).name);
 
   if (destinationNamesList.length <= MAX_DISPLAYED_DESTINATIONS) {
     return destinationNamesList.join('&nbsp;&mdash;&nbsp;');
@@ -48,7 +46,7 @@ const calculateTotalCost = ({ offerTypes, events }) => {
 
   const totalCost = events.reduce((result, event) => {
     let offersCost = 0;
-    const { offers } = offerTypes.find((type) => type.type === event.type);
+    const { offers } = offerTypes.get(event.type);
 
     if (offers.length !== 0 && event.offers !== 0) {
       offersCost = offers.reduce((accum, offer) => {

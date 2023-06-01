@@ -53,15 +53,15 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
         </div>`)).join('')}
     </div>`);
 
-const createEventsEditOffersTemplate = (offerTypes, eventSelectedOffers) => {
-  if (offerTypes.offers.length === 0) {
+const createEventsEditOffersTemplate = (offerTypeItem, eventSelectedOffers) => {
+  if (offerTypeItem.offers.length === 0) {
     return '';
   }
 
   return (/*html*/`
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-      ${createOffersListTemplate(offerTypes.offers, eventSelectedOffers)}
+      ${createOffersListTemplate(offerTypeItem.offers, eventSelectedOffers)}
     </section>`);
 };
 
@@ -70,7 +70,7 @@ const createEventsEditOffersTemplate = (offerTypes, eventSelectedOffers) => {
 
 const createDestinationListTemplate = ({ destinations, event }) => (/*html*/`
   <datalist id="destination-list-${event.id}">
-    ${destinations.map((destination) => `<option value="${destination.name}" data-destination-id="${destination.id}"></option>`).join('')}
+    ${Array.from(destinations).map(([, destination]) => `<option value="${destination.name}" data-destination-id="${destination.id}"></option>`).join('')}
   </datalist>`);
 
 //* Шаблон разметки выбора типа события
@@ -80,7 +80,7 @@ const createEventTypeListTemplate = ({ offerTypes, event }) => (/*html*/`
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${offerTypes.map((type) => (/*html*/`
+        ${Array.from(offerTypes).map(([, type]) => (/*html*/`
           <div class="event__type-item">
             <input
               id="event-type-${type.type}-${event.id}"
@@ -266,7 +266,7 @@ export default class EventFormItemView extends AbstractStatefulView {
     this.updateElement({
       offers: [],
       type: evt.target.value,
-      offerTypeItem: EventFormItemView.#getOfferTypeItem(this.#data.offerTypes, evt.target.value)
+      offerTypeItem: this.#data.offerTypes.get(evt.target.value)
     });
   };
 
@@ -277,7 +277,7 @@ export default class EventFormItemView extends AbstractStatefulView {
       const newInputValueId = destinationListItem.dataset.destinationId;
       this.updateElement({
         destination: newInputValueId,
-        destinationItem: EventFormItemView.#getDestinationItem(this.#data.destinations, newInputValueId)
+        destinationItem: this.#data.destinations.get(newInputValueId)
       });
     }
   };
@@ -315,8 +315,8 @@ export default class EventFormItemView extends AbstractStatefulView {
   static parseEventDataToState({ destinations, offerTypes, event }) {
     return {
       ...event,
-      offerTypeItem: this.#getOfferTypeItem(offerTypes, event.type),
-      destinationItem: this.#getDestinationItem(destinations, event.destination)
+      offerTypeItem: offerTypes.get(event.type),
+      destinationItem: destinations.get(event.destination)
     };
   }
 
@@ -327,13 +327,5 @@ export default class EventFormItemView extends AbstractStatefulView {
     delete event.destinationItem;
 
     return event;
-  }
-
-  static #getOfferTypeItem(offerTypes, eventType) {
-    return offerTypes.find((type) => type.type === eventType);
-  }
-
-  static #getDestinationItem(destinations, eventDestinationId) {
-    return destinations.find((item) => item.id === eventDestinationId);
   }
 }

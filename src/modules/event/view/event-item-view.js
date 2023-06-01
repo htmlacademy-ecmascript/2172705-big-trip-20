@@ -4,7 +4,7 @@ import { DateFormat, convertDate, getDuration, formatDuration } from '../../../u
 
 const isEventFavorite = (isFavorite) => isFavorite ? 'event__favorite-btn--active' : '';
 
-const createSelectedOffersTemplate = (eventSelectedOffers, offerTypes) => {
+const createSelectedOffersTemplate = (eventSelectedOffers, offerTypeItem) => {
   if (eventSelectedOffers.length === 0) {
     return '';
   }
@@ -12,7 +12,7 @@ const createSelectedOffersTemplate = (eventSelectedOffers, offerTypes) => {
   return (/*html*/`
     <ul class="event__selected-offers">
       ${eventSelectedOffers.map((id) => {
-      const offerItem = offerTypes.offers.find((offer) => offer.id === id);
+      const offerItem = offerTypeItem.offers.find((offer) => offer.id === id);
 
       return (/*html*/`
         <li class="event__offer">
@@ -27,8 +27,8 @@ const createSelectedOffersTemplate = (eventSelectedOffers, offerTypes) => {
 const createEventsItemTemplate = ({ destinations, offerTypes, event }) => {
   const { type: eventType, destination: destinationId, offers: eventSelectedOffers, basePrice, isFavorite, dateFrom, dateTo } = event;
 
-  const destinationItem = destinations.find((destination) => destination.id === destinationId);
-  const offerTypeItem = offerTypes.find((type) => type.type === eventType);
+  const destinationItem = destinations.get(destinationId);
+  const offerTypeItem = offerTypes.get(eventType);
 
   return (/*html*/`
     <li class="trip-events__item">
