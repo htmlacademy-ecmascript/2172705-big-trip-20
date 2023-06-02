@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import NewEventButtonView from '../view/new-event-button-view.js';
 import EventFormItemView from '../../event/view/event-form-item-view';
 import { RenderPosition, render, remove } from '../../../framework/render';
+import { getRandomItem } from '../../../utils/common.js';
 import { FilterType, UpdateType, UserAction } from '../../../const';
 
 const tripMain = document.querySelector('.trip-main');
@@ -73,10 +74,10 @@ export default class NewEventPresenter {
       basePrice: 1,
       dateFrom: new Date(),
       dateTo: new Date(),
-      destination: this.#destinationsModel.destinations[0].id,
+      destination: getRandomItem(this.#destinationsModel.destinations).id,
       isFavorite: false,
       offers: [],
-      type: this.#offerTypesModel.offerTypes[0].type
+      type: getRandomItem(this.#offerTypesModel.offerTypes).type
     };
   }
 

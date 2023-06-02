@@ -49,13 +49,7 @@ const calculateTotalCost = ({ offerTypes, events }) => {
     const { offers } = offerTypes.get(event.type);
 
     if (offers.length !== 0 && event.offers !== 0) {
-      offersCost = offers.reduce((accum, offer) => {
-        if (event.offers.includes(offer.id)) {
-          return accum + offer.price;
-        }
-
-        return accum;
-      }, 0);
+      offersCost = offers.reduce((accum, offer) => event.offers.includes(offer.id) ? accum + offer.price : accum, 0);
     }
 
     return result + event.basePrice + offersCost;

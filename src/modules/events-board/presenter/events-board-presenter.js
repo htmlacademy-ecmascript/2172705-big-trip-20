@@ -88,7 +88,7 @@ export default class EventsBoardPresenter {
     this.#renderEventsBoardSort();
   }
 
-  #clearEventsBoard({ resetSortType = false } = {}) {
+  clearEventsBoard({ resetSortType = false } = {}) {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
@@ -126,9 +126,9 @@ export default class EventsBoardPresenter {
     this.#eventPresenters.set(event.id, eventsBoardItemPresenter);
   }
 
-  renderEventsBoardMessage({ message, currentFilter }) {
-    this.#clearEventsBoard();
-    this.#eventsBoardMessageComponent = new EventsBoardMessageView({ message, currentFilter });
+  renderEventsBoardMessage({ message, currentFilter, error = null }) {
+    const messageText = error ? error.message : message;
+    this.#eventsBoardMessageComponent = new EventsBoardMessageView({ message: messageText, currentFilter });
     render(this.#eventsBoardMessageComponent, tripEvents);
   }
 
@@ -154,17 +154,17 @@ export default class EventsBoardPresenter {
         this.#eventPresenters.get(updatedEvent.id).init({ destinations: this.destinations, offerTypes: this.offerTypes, event: updatedEvent });
         break;
       case UpdateType.MINOR:
-        this.#clearEventsBoard();
+        this.clearEventsBoard();
         this.#renderEventsBoard();
         break;
       case UpdateType.MAJOR:
-        this.#clearEventsBoard({ resetSortType: true });
+        this.clearEventsBoard({ resetSortType: true });
         this.#renderEventsBoard();
         break;
       case UpdateType.INIT:
         try {
           this.#isLoading = false;
-          this.#clearEventsBoard();
+          this.clearEventsBoard();
           this.#renderEventsBoard();
           break;
         } catch {
@@ -182,7 +182,7 @@ export default class EventsBoardPresenter {
 
   #onSortTypeChange = (sortTypeName) => {
     this.#currentSortType = SortType[sortTypeName];
-    this.#clearEventsBoard();
+    this.clearEventsBoard();
     this.#renderEventsBoard();
   };
 }

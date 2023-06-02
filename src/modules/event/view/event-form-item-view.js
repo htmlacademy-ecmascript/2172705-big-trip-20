@@ -1,3 +1,4 @@
+import he from 'he';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -24,7 +25,7 @@ const createEventPhotosTemplate = (picturesList) => {
 const createEventsEditDestinationTemplate = (destinationItem) => (/*html*/`
     <section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${destinationItem.description}</p>
+      <p class="event__destination-description">${he.encode(destinationItem.description)}</p>
       ${createEventPhotosTemplate(destinationItem.pictures)}
     </section>`);
 
@@ -46,9 +47,9 @@ const createOffersListTemplate = (offersList, eventSelectedOffers) => (/*html*/`
             ${isOfferSelected(offer.id, eventSelectedOffers)}
           >
           <label class="event__offer-label" for="event-offer-${offer.title}-${offer.id}">
-            <span class="event__offer-title">${offer.title}</span>
+            <span class="event__offer-title">${he.encode(offer.title)}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-price">${offer.price}</span>
+            <span class="event__offer-price">${he.encode(offer.price.toString())}</span>
           </label>
         </div>`)).join('')}
     </div>`);

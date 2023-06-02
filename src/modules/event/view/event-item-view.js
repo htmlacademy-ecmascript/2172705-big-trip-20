@@ -1,3 +1,5 @@
+import he from 'he';
+
 import AbstractView from '../../../framework/view/abstract-view.js';
 import { capitalizeWord } from '../../../utils/common.js';
 import { DateFormat, convertDate, getDuration, formatDuration } from '../../../utils/date.js';
@@ -16,9 +18,9 @@ const createSelectedOffersTemplate = (eventSelectedOffers, offerTypeItem) => {
 
       return (/*html*/`
         <li class="event__offer">
-          <span class="event__offer-title">${offerItem.title}</span>
+          <span class="event__offer-title">${he.encode(offerItem.title)}</span>
           &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offerItem.price}</span>
+          <span class="event__offer-price">${he.encode(offerItem.price.toString())}</span>
         </li>`);
     }).join('')}
     </ul>`);
@@ -37,7 +39,7 @@ const createEventsItemTemplate = ({ destinations, offerTypes, event }) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${capitalizeWord(eventType)} ${destinationItem.name}</h3>
+        <h3 class="event__title">${he.encode(capitalizeWord(eventType))} ${he.encode(destinationItem.name)}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${dateFrom}">${convertDate(dateFrom, DateFormat.TIME)}</time>
@@ -47,7 +49,7 @@ const createEventsItemTemplate = ({ destinations, offerTypes, event }) => {
           <p class="event__duration">${formatDuration(getDuration(dateFrom, dateTo))}</p>
         </div>
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
+          &euro;&nbsp;<span class="event__price-value">${he.encode(basePrice.toString())}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         ${createSelectedOffersTemplate(eventSelectedOffers, offerTypeItem)}
