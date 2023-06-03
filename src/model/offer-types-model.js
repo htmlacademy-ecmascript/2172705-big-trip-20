@@ -10,7 +10,7 @@ export default class OfferTypesModel {
     try {
       this.#offerTypes = await this.#serverDataApiService.getOfferTypes();
     } catch {
-      throw new Error('Can\'t to load offer types data from server!');
+      throw new Error('Can\'t load offer types data from server!');
     }
   }
 

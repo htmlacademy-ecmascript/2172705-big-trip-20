@@ -3,11 +3,12 @@ import EventsBoardSortView from '../view/events-board-sort-view.js';
 import EventsBoardListView from '../view/events-board-list-view.js';
 import EventsBoardMessageView from '../view/events-board-message-view.js';
 
+import UiBlocker from '../../../framework/ui-blocker/ui-blocker.js';
 import { RenderPosition, remove, render } from '../../../framework/render.js';
 import { sortByDurationDesc, sortByDateFromAsc } from '../../../utils/date.js';
 import { filterEventsBy } from '../../../utils/filters.js';
 import { sortByDesc } from '../../../utils/common.js';
-import { SortType, UpdateType, UserAction } from '../../../const.js';
+import { TimeLimit, SortType, UpdateType, UserAction } from '../../../const.js';
 
 const tripEvents = document.querySelector('.trip-events');
 
@@ -28,6 +29,11 @@ export default class EventsBoardPresenter {
   #currentSortType = this.#defaultSortType;
 
   #isLoading = true;
+
+  #UIBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({ destinationsModel, offerTypesModel, eventsModel, filtersModel }) {
     this.#destinationsModel = destinationsModel;
@@ -132,20 +138,39 @@ export default class EventsBoardPresenter {
     render(this.#eventsBoardMessageComponent, tripEvents);
   }
 
-  onEventUserAction = (actionType, updateType, updatedEvent) => {
+  onEventUserAction = async (actionType, updateType, updatedEvent) => {
+    this.#UIBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this.#eventsModel.updateEvent(updateType, updatedEvent);
+        this.#eventPresenters.get(updatedEvent.id).setSaving();
+        try {
+          await this.#eventsModel.updateEvent(updateType, updatedEvent);
+        } catch {
+          this.#eventPresenters.get(updatedEvent.id).setAborting();
+        }
         break;
       case UserAction.ADD_EVENT:
-        this.#eventsModel.addEvent(updateType, updatedEvent);
+        this.#newEventPresenter.setSaving();
+        try {
+          await this.#eventsModel.addEvent(updateType, updatedEvent);
+        } catch {
+          this.#newEventPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_EVENT:
-        this.#eventsModel.deleteEvent(updateType, updatedEvent);
+        this.#eventPresenters.get(updatedEvent.id).setDeleting();
+        try {
+          await this.#eventsModel.deleteEvent(updateType, updatedEvent);
+        } catch {
+          this.#eventPresenters.get(updatedEvent.id).setAborting();
+        }
         break;
       default:
         throw new Error(`No implementation of interaction with the model with the type of user action was found ${actionType}`);
     }
+
+    this.#UIBlocker.unblock();
   };
 
   #onModelChange = (updateType, updatedEvent) => {

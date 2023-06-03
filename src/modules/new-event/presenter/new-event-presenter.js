@@ -1,5 +1,3 @@
-import { nanoid } from 'nanoid';
-
 import NewEventButtonView from '../view/new-event-button-view.js';
 import EventFormItemView from '../../event/view/event-form-item-view';
 import { RenderPosition, render, remove } from '../../../framework/render';
@@ -30,6 +28,24 @@ export default class NewEventPresenter {
     this.deactivateNewEventButton();
   }
 
+  setSaving() {
+    this.#newEventFormComponent.updateElement({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+
+  setAborting() {
+    const resetFormDisabling = () =>
+      this.#newEventFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+
+    this.#newEventFormComponent.shake(resetFormDisabling);
+  }
+
   #createNewEvent() {
     this.#newEventFormComponent = new EventFormItemView({
       data: { destinations: this.#destinationsModel.destinations, offerTypes: this.#offerTypesModel.offerTypes, event: this.#createNewEventBlank() },
@@ -39,7 +55,7 @@ export default class NewEventPresenter {
     });
 
     render(this.#newEventFormComponent, this.#boardPresenter.eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#onEscKeydownClick);
+    document.addEventListener('keydown', this.#onDocumentEscapeKeydown);
   }
 
   closeNewEventForm = () => {
@@ -48,7 +64,7 @@ export default class NewEventPresenter {
     }
 
     this.activateNewEventButton();
-    document.removeEventListener('keydown', this.#onEscKeydownClick);
+    document.removeEventListener('keydown', this.#onDocumentEscapeKeydown);
 
     remove(this.#newEventFormComponent);
     this.#newEventFormComponent = null;
@@ -92,14 +108,13 @@ export default class NewEventPresenter {
     this.#boardPresenter.onEventUserAction(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
-      { ...newEvent, id: nanoid() }
+      newEvent
     );
-    this.closeNewEventForm();
   };
 
   #onCancelButtonClick = () => this.closeNewEventForm();
 
-  #onEscKeydownClick = (evt) => {
+  #onDocumentEscapeKeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       this.closeNewEventForm();

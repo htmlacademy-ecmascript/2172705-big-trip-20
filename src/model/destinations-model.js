@@ -10,7 +10,7 @@ export default class DestinationsModel {
     try {
       this.#destinations = await this.#serverDataApiService.getDestinations();
     } catch {
-      throw new Error('Can\'t to load destinations data from server!');
+      throw new Error('Can\'t load destinations data from server!');
     }
   }
 

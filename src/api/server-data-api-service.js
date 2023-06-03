@@ -26,6 +26,19 @@ export default class ServerDataApiService extends ApiService {
     return adaptedEvents;
   }
 
+  async addEvent(event) {
+    const response = await this._load({
+      url: 'points',
+      method: HTTPMethod.POST,
+      body: JSON.stringify(this.#adaptClientEventToServer(event)),
+      headers: new Headers({ 'Content-Type': 'application/json' })
+    });
+    const parsedResponse = await ApiService.parseResponse(response);
+    const adaptedEvent = this.#adaptServerEventToClient(parsedResponse);
+
+    return adaptedEvent;
+  }
+
   async updateEvent(event) {
     const response = await this._load({
       url: `points/${event.id}`,
@@ -37,6 +50,15 @@ export default class ServerDataApiService extends ApiService {
     const adaptedEvent = this.#adaptServerEventToClient(parsedResponse);
 
     return adaptedEvent;
+  }
+
+  async deleteEvent(event) {
+    const response = await this._load({
+      url: `points/${event.id}`,
+      method: HTTPMethod.DELETE
+    });
+
+    return response;
   }
 
   #adaptServerEventToClient(event) {

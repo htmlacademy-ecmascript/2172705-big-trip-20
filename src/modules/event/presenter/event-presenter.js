@@ -51,11 +51,46 @@ export default class EventPresenter {
     }
 
     if (this.#mode === EventMode.EDITING) {
-      replace(this.#eventFormItem, prevEventEditItemComponent);
+      replace(this.#eventItem, prevEventEditItemComponent);
+      this.#mode = EventMode.DEFAULT;
     }
 
     remove(prevEventItemComponent);
     remove(prevEventEditItemComponent);
+  }
+
+  setSaving() {
+    if (this.#mode === EventMode.EDITING) {
+      this.#eventFormItem.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === EventMode.EDITING) {
+      this.#eventFormItem.updateElement({
+        isDisabled: true,
+        isDeleting: true
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === EventMode.DEFAULT) {
+      this.#eventItem.shake();
+      return;
+    }
+
+    const resetFormDisabling = () =>
+      this.#eventFormItem.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+
+    this.#eventFormItem.shake(resetFormDisabling);
   }
 
   destroy() {
@@ -104,7 +139,6 @@ export default class EventPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       updatedEvent
     );
-    this.#replaceEditFormToEventItem();
   };
 
   #onDeleteButtonClick = (updatedEvent) => {
