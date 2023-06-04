@@ -154,6 +154,7 @@ export default class EventsBoardPresenter {
         this.#newEventPresenter.setSaving();
         try {
           await this.#eventsModel.addEvent(updateType, updatedEvent);
+          this.#newEventPresenter.activateNewEventButton();
         } catch {
           this.#newEventPresenter.setAborting();
         }
@@ -181,7 +182,6 @@ export default class EventsBoardPresenter {
       case UpdateType.MINOR:
         this.clearEventsBoard();
         this.#renderEventsBoard();
-        this.#newEventPresenter.activateNewEventButton();
         break;
       case UpdateType.MAJOR:
         this.clearEventsBoard({ resetSortType: true });
