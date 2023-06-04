@@ -1,5 +1,5 @@
 const MAX_DISPLAYED_DESTINATIONS = 3;
-const END_POINT = 'https://20.objects.pages.academy/big-trip';
+const END_POINT = 'https://20.ecmascript.pages.academy/big-trip';
 const ERROR_MESSAGE_SHOW_TIME = 5000;
 
 const HTTPMethod = {
