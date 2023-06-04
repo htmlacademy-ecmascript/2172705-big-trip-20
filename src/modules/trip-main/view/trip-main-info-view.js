@@ -7,7 +7,7 @@ import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
 //* ------------------------------------------------------
 
 const getTitle = ({ destinations, events }) => {
-  const destinationNamesList = [...events]
+  const destinationNamesList = events
     .sort(sortByAsc('dateFrom'))
     .map((event) => destinations.get(event.destination).name);
 
