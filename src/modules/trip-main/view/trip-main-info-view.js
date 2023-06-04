@@ -7,7 +7,9 @@ import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
 //* ------------------------------------------------------
 
 const getTitle = ({ destinations, events }) => {
-  const destinationNamesList = events.map((event) => destinations.get(event.destination).name);
+  const destinationNamesList = [...events]
+    .sort(sortByAsc('dateFrom'))
+    .map((event) => destinations.get(event.destination).name);
 
   if (destinationNamesList.length <= MAX_DISPLAYED_DESTINATIONS) {
     return destinationNamesList.join('&nbsp;&mdash;&nbsp;');
@@ -26,6 +28,7 @@ const getTripDates = ({ events }) => {
 
   const firstEventSortedByDateTo = events.sort(sortByAsc('dateFrom')).at(0);
   const lastEventSortedByDateTo = events.sort(sortByAsc('dateTo')).at(-1);
+
   const formattedDateFrom = convertDate(firstEventSortedByDateTo.dateFrom, DateFormat.EVENT_DATE);
   let formattedDateTo = convertDate(lastEventSortedByDateTo.dateTo, DateFormat.EVENT_DATE);
 
