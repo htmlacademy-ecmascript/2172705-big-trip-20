@@ -1,5 +1,6 @@
 import NewEventButtonView from '../view/new-event-button-view.js';
 import EventFormItemView from '../../event/view/event-form-item-view';
+
 import { RenderPosition, render, remove } from '../../../framework/render';
 import { getRandomItem } from '../../../utils/common.js';
 import { FilterType, UpdateType, UserAction } from '../../../const';
@@ -59,16 +60,26 @@ export default class NewEventPresenter {
       return;
     }
 
+    this.#boardPresenter.setIsCreatingFlagValue(false);
     this.activateNewEventButton();
     document.removeEventListener('keydown', this.#onDocumentEscapeKeydown);
 
     remove(this.#newEventFormComponent);
     this.#newEventFormComponent = null;
+
+    if (this.#boardPresenter.events.length === 0) {
+      this.#boardPresenter.clearEventsBoard();
+      this.#boardPresenter.renderEventsBoard();
+    }
   };
 
   #createNewEvent() {
     this.#newEventFormComponent = new EventFormItemView({
-      data: { destinations: this.#destinationsModel.destinations, offerTypes: this.#offerTypesModel.offerTypes, event: this.#createNewEventBlank() },
+      data: {
+        destinations: this.#destinationsModel.destinations,
+        offerTypes: this.#offerTypesModel.offerTypes,
+        event: this.#createNewEventBlank()
+      },
       isNewEvent: true,
       onFormSubmit: this.#onNewEventFormSubmit,
       onButtonClick: this.#onCancelButtonClick
@@ -98,6 +109,7 @@ export default class NewEventPresenter {
   }
 
   #onNewEventButtonClick = () => {
+    this.#boardPresenter.setIsCreatingFlagValue(true);
     this.#boardPresenter.setDefaultSortType();
     this.#filtersModel.setCurrentFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#createNewEvent();

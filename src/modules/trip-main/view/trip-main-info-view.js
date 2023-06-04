@@ -1,4 +1,5 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
+
 import { sortByAsc } from '../../../utils/common.js';
 import { DateFormat, convertDate, isSameDate } from '../../../utils/date.js';
 import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
@@ -26,8 +27,12 @@ const getTripDates = ({ events }) => {
     return '';
   }
 
-  const firstEventSortedByDateTo = events.sort(sortByAsc('dateFrom')).at(0);
-  const lastEventSortedByDateTo = events.sort(sortByAsc('dateTo')).at(-1);
+  const firstEventSortedByDateTo = events
+    .sort(sortByAsc('dateFrom'))
+    .at(0);
+  const lastEventSortedByDateTo = events
+    .sort(sortByAsc('dateTo'))
+    .at(-1);
 
   const formattedDateFrom = convertDate(firstEventSortedByDateTo.dateFrom, DateFormat.EVENT_DATE);
   let formattedDateTo = convertDate(lastEventSortedByDateTo.dateTo, DateFormat.EVENT_DATE);

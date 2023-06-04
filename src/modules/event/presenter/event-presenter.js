@@ -1,5 +1,6 @@
 import EventItemView from '../view/event-item-view.js';
 import EventFormItemView from '../view/event-form-item-view.js';
+
 import { render, replace, remove } from '../../../framework/render.js';
 import { isSameDate } from '../../../utils/date.js';
 import { EventMode, UserAction, UpdateType } from '../../../const.js';

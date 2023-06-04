@@ -3,6 +3,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
 import AbstractStatefulView from '../../../framework/view/abstract-stateful-view.js';
+
 import { capitalizeWord } from '../../../utils/common.js';
 import { DateFormat, convertDate } from '../../../utils/date.js';
 
@@ -72,30 +73,40 @@ const createEventsEditOffersTemplate = (offerTypeItem, eventSelectedOffers, isDi
 
 const createDestinationListTemplate = ({ destinations, event }) => (/*html*/`
   <datalist id="destination-list-${event.id}">
-    ${Array.from(destinations.values()).map((destination) => `<option value="${destination.name}" data-destination-id="${destination.id}"></option>`).join('')}
+    ${Array
+    .from(destinations.values())
+    .map((destination) => `<option value="${destination.name}" data-destination-id="${destination.id}"></option>`)
+    .join('')}
   </datalist>`);
 
 //* Шаблон разметки выбора типа события
 //* ------------------------------------------------------
 
 const createEventTypeListTemplate = ({ offerTypes, event }) => (/*html*/`
-    <div class="event__type-list">
-      <fieldset class="event__type-group">
-        <legend class="visually-hidden">Event type</legend>
-        ${Array.from(offerTypes.values()).map((offerType) => (/*html*/`
-          <div class="event__type-item">
-            <input
-              id="event-type-${offerType.type}-${event.id}"
-              class="event__type-input  visually-hidden"
-              type="radio"
-              name="event-type"
-              value="${offerType.type}"
-              ${event.type === offerType.type ? 'checked' : ''}
+  <div class="event__type-list">
+    <fieldset class="event__type-group">
+      <legend class="visually-hidden">Event type</legend>
+      ${Array
+    .from(offerTypes.values())
+    .map((offerType) => (/*html*/`
+        <div class="event__type-item">
+          <input
+            id="event-type-${offerType.type}-${event.id}"
+            class="event__type-input  visually-hidden"
+            type="radio"
+            name="event-type"
+            value="${offerType.type}"
+            ${event.type === offerType.type ? 'checked' : ''}
+          >
+          <label
+            class="event__type-label  event__type-label--${offerType.type}"
+            for="event-type-${offerType.type}-${event.id}"
             >
-            <label class="event__type-label  event__type-label--${offerType.type}" for="event-type-${offerType.type}-${event.id}">${capitalizeWord(offerType.type)}</label>
-          </div>`)).join('')}
-      </fieldset>
-    </div>`);
+            ${capitalizeWord(offerType.type)}
+          </label>
+        </div>`)).join('')}
+    </fieldset>
+  </div>`);
 
 //* Шаблон разметки изменения точки маршрута
 //* ------------------------------------------------------
@@ -195,7 +206,13 @@ const createEventsFormItemTemplate = ({ destinations, offerTypes, event }, isNew
             >
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving' : 'Save'}</button>
+          <button
+            class="event__save-btn  btn  btn--blue"
+            type="submit"
+            ${isDisabled ? 'disabled' : ''}
+            >
+            ${isSaving ? 'Saving' : 'Save'}
+          </button>
           ${createButtonsTemplate(isNewEvent, isDisabled, isDeleting)}
         </header>
         <section class="event__details">
@@ -238,12 +255,14 @@ export default class EventFormItemView extends AbstractStatefulView {
   removeElement() {
     super.removeElement();
 
-    Object.entries(this.#datePickers).forEach(([picker, isExist]) => {
-      if (isExist) {
-        this.#datePickers[picker].destroy();
-        this.#datePickers[picker] = null;
-      }
-    });
+    Object
+      .entries(this.#datePickers)
+      .forEach(([picker, isExist]) => {
+        if (isExist) {
+          this.#datePickers[picker].destroy();
+          this.#datePickers[picker] = null;
+        }
+      });
   }
 
   reset() {
@@ -252,18 +271,37 @@ export default class EventFormItemView extends AbstractStatefulView {
 
   _restoreHandlers() {
     if (!this.#isNewEvent) {
-      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#onRollupButtonClick);
+      this.element
+        .querySelector('.event__rollup-btn')
+        .addEventListener('click', this.#onRollupButtonClick);
     }
 
     if (this._state.offerTypeItem.offers.length !== 0) {
-      this.element.querySelector('.event__available-offers').addEventListener('change', this.#availableOfferChangeHandler);
+      this.element
+        .querySelector('.event__available-offers')
+        .addEventListener('change', this.#availableOfferChangeHandler);
     }
 
-    this.element.querySelector('.event__type-list').addEventListener('change', this.#eventTypeChangeHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationFieldInputHandler);
-    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceFieldInputHandler);
-    this.element.querySelector('.event--edit').addEventListener('submit', this.#formSubmitHandler);
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deleteButtonClickHandler);
+    this.element
+      .querySelector('.event__type-list')
+      .addEventListener('change', this.#eventTypeChangeHandler);
+
+    this.element
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this.#destinationFieldInputHandler);
+
+    this.element
+      .querySelector('.event__input--price')
+      .addEventListener('input', this.#priceFieldInputHandler);
+
+    this.element
+      .querySelector('.event--edit')
+      .addEventListener('submit', this.#formSubmitHandler);
+
+    this.element
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this.#deleteButtonClickHandler);
+
 
     this.#setDateFromPicker();
     this.#setDateToPicker();

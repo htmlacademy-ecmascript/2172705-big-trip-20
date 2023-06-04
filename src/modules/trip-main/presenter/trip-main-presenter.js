@@ -1,4 +1,5 @@
 import TripMainInfoView from '../view/trip-main-info-view.js';
+
 import { RenderPosition, render, remove, replace } from '../../../framework/render.js';
 
 const tripMainContainer = document.querySelector('.trip-main');
