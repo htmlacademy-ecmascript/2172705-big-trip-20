@@ -1,8 +1,8 @@
-import { nanoid } from 'nanoid';
-
 import NewEventButtonView from '../view/new-event-button-view.js';
 import EventFormItemView from '../../event/view/event-form-item-view';
+
 import { RenderPosition, render, remove } from '../../../framework/render';
+import { getRandomItem } from '../../../utils/common.js';
 import { FilterType, UpdateType, UserAction } from '../../../const';
 
 const tripMain = document.querySelector('.trip-main');
@@ -29,29 +29,23 @@ export default class NewEventPresenter {
     this.deactivateNewEventButton();
   }
 
-  #createNewEvent() {
-    this.#newEventFormComponent = new EventFormItemView({
-      data: { destinations: this.#destinationsModel.destinations, offerTypes: this.#offerTypesModel.offerTypes, event: this.#createNewEventBlank() },
-      isNewEvent: true,
-      onFormSubmit: this.#onNewEventFormSubmit,
-      onButtonClick: this.#onCancelButtonClick
+  setSaving() {
+    this.#newEventFormComponent.updateElement({
+      isDisabled: true,
+      isSaving: true
     });
-
-    render(this.#newEventFormComponent, this.#boardPresenter.eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#onEscKeydownClick);
   }
 
-  closeNewEventForm = () => {
-    if (this.#newEventFormComponent === null) {
-      return;
-    }
+  setAborting() {
+    const resetFormDisabling = () =>
+      this.#newEventFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
 
-    this.activateNewEventButton();
-    document.removeEventListener('keydown', this.#onEscKeydownClick);
-
-    remove(this.#newEventFormComponent);
-    this.#newEventFormComponent = null;
-  };
+    this.#newEventFormComponent.shake(resetFormDisabling);
+  }
 
   activateNewEventButton = () => {
     this.#newEventButtonComponent.element.disabled = false;
@@ -60,6 +54,40 @@ export default class NewEventPresenter {
   deactivateNewEventButton = () => {
     this.#newEventButtonComponent.element.disabled = true;
   };
+
+  closeNewEventForm = () => {
+    if (this.#newEventFormComponent === null) {
+      return;
+    }
+
+    this.#boardPresenter.setIsCreatingFlagValue(false);
+    this.activateNewEventButton();
+    document.removeEventListener('keydown', this.#onDocumentEscapeKeydown);
+
+    remove(this.#newEventFormComponent);
+    this.#newEventFormComponent = null;
+
+    if (this.#boardPresenter.events.length === 0) {
+      this.#boardPresenter.clearEventsBoard();
+      this.#boardPresenter.renderEventsBoard();
+    }
+  };
+
+  #createNewEvent() {
+    this.#newEventFormComponent = new EventFormItemView({
+      data: {
+        destinations: this.#destinationsModel.destinations,
+        offerTypes: this.#offerTypesModel.offerTypes,
+        event: this.#createNewEventBlank()
+      },
+      isNewEvent: true,
+      onFormSubmit: this.#onNewEventFormSubmit,
+      onButtonClick: this.#onCancelButtonClick
+    });
+
+    render(this.#newEventFormComponent, this.#boardPresenter.eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
+    document.addEventListener('keydown', this.#onDocumentEscapeKeydown);
+  }
 
   #renderNewEventButton() {
     this.#newEventButtonComponent = new NewEventButtonView({
@@ -73,14 +101,15 @@ export default class NewEventPresenter {
       basePrice: 1,
       dateFrom: new Date(),
       dateTo: new Date(),
-      destination: this.#destinationsModel.destinations[0].id,
+      destination: getRandomItem(this.#destinationsModel.destinations).id,
       isFavorite: false,
       offers: [],
-      type: this.#offerTypesModel.offerTypes[0].type
+      type: getRandomItem(this.#offerTypesModel.offerTypes).type
     };
   }
 
   #onNewEventButtonClick = () => {
+    this.#boardPresenter.setIsCreatingFlagValue(true);
     this.#boardPresenter.setDefaultSortType();
     this.#filtersModel.setCurrentFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#createNewEvent();
@@ -91,14 +120,13 @@ export default class NewEventPresenter {
     this.#boardPresenter.onEventUserAction(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
-      { ...newEvent, id: nanoid() }
+      newEvent
     );
-    this.closeNewEventForm();
   };
 
   #onCancelButtonClick = () => this.closeNewEventForm();
 
-  #onEscKeydownClick = (evt) => {
+  #onDocumentEscapeKeydown = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       this.closeNewEventForm();

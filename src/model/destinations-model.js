@@ -6,15 +6,15 @@ export default class DestinationsModel {
     this.#serverDataApiService = serverDataApiService;
   }
 
+  get destinations() {
+    return this.#destinations;
+  }
+
   async init() {
     try {
       this.#destinations = await this.#serverDataApiService.getDestinations();
     } catch {
-      throw new Error('Can\'t to load destinations data from server!');
+      throw new Error('Can\'t load destinations data from server!');
     }
-  }
-
-  get destinations() {
-    return this.#destinations;
   }
 }

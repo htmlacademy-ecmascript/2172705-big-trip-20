@@ -1,43 +1,68 @@
 import ApiService from '../framework/api-service.js';
+
 import { HTTPMethod } from '../const.js';
 
 export default class ServerDataApiService extends ApiService {
   async getDestinations() {
     const response = await this._load({ url: 'destinations' });
     const parsedResponse = await ApiService.parseResponse(response);
+    const adaptedDestinations = this.#adaptServerDestinationsToClient(parsedResponse);
 
-    return parsedResponse;
+    return adaptedDestinations;
   }
 
   async getOfferTypes() {
     const response = await this._load({ url: 'offers' });
     const parsedResponse = await ApiService.parseResponse(response);
+    const adaptedDestinations = this.#adaptServerOfferTypesToClient(parsedResponse);
 
-    return parsedResponse;
+    return adaptedDestinations;
   }
 
   async getEvents() {
     const response = await this._load({ url: 'points' });
     const parsedResponse = await ApiService.parseResponse(response);
-    const adaptedEvents = parsedResponse.map(this.#adaptServerDataToClient);
+    const adaptedEvents = parsedResponse.map(this.#adaptServerEventToClient);
 
     return adaptedEvents;
+  }
+
+  async addEvent(event) {
+    const response = await this._load({
+      url: 'points',
+      method: HTTPMethod.POST,
+      body: JSON.stringify(this.#adaptClientEventToServer(event)),
+      headers: new Headers({ 'Content-Type': 'application/json' })
+    });
+    const parsedResponse = await ApiService.parseResponse(response);
+    const adaptedEvent = this.#adaptServerEventToClient(parsedResponse);
+
+    return adaptedEvent;
   }
 
   async updateEvent(event) {
     const response = await this._load({
       url: `points/${event.id}`,
       method: HTTPMethod.PUT,
-      body: JSON.stringify(this.#adaptClientDataToServer(event)),
+      body: JSON.stringify(this.#adaptClientEventToServer(event)),
       headers: new Headers({ 'Content-Type': 'application/json' })
     });
     const parsedResponse = await ApiService.parseResponse(response);
-    const adaptedEvent = this.#adaptServerDataToClient(parsedResponse);
+    const adaptedEvent = this.#adaptServerEventToClient(parsedResponse);
 
     return adaptedEvent;
   }
 
-  #adaptServerDataToClient(event) {
+  async deleteEvent(event) {
+    const response = await this._load({
+      url: `points/${event.id}`,
+      method: HTTPMethod.DELETE
+    });
+
+    return response;
+  }
+
+  #adaptServerEventToClient(event) {
     const adaptedEvent = {
       ...event,
       basePrice: event['base_price'],
@@ -54,7 +79,7 @@ export default class ServerDataApiService extends ApiService {
     return adaptedEvent;
   }
 
-  #adaptClientDataToServer(event) {
+  #adaptClientEventToServer(event) {
     const adaptedEvent = {
       ...event,
       'base_price': event['basePrice'],
@@ -69,5 +94,13 @@ export default class ServerDataApiService extends ApiService {
     delete adaptedEvent['isFavorite'];
 
     return adaptedEvent;
+  }
+
+  #adaptServerDestinationsToClient(parsedResponse) {
+    return new Map(parsedResponse.map((item) => [item.id, item]));
+  }
+
+  #adaptServerOfferTypesToClient(parsedResponse) {
+    return new Map(parsedResponse.map((item) => [item.type, item]));
   }
 }

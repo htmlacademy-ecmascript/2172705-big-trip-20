@@ -2,8 +2,8 @@ const sortByAsc = (propertyName) => (first, second) => first[propertyName] - sec
 
 const sortByDesc = (propertyName) => (first, second) => second[propertyName] - first[propertyName];
 
-const getRandomInteger = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+const getRandomItem = (iterable) => iterable.get([...iterable.keys()][Math.floor(Math.random() * iterable.size)]);
 
 const capitalizeWord = (word) => word[0].toUpperCase() + word.slice(1);
 
-export { sortByAsc, sortByDesc, getRandomInteger, capitalizeWord };
+export { sortByAsc, sortByDesc, getRandomItem, capitalizeWord };

@@ -37,6 +37,8 @@ eventsBoardPresenter.init({ newEventPresenter });
 
 Promise.all([destinationsModel.init(), offerTypesModel.init()])
   .then(() => eventsModel.init())
-  .catch(((error) => eventsBoardPresenter.renderEventsBoardMessage({ message: error.message })))
-  .finally(() => newEventPresenter.activateNewEventButton());
-
+  .then(() => newEventPresenter.activateNewEventButton())
+  .catch(((error) => {
+    eventsBoardPresenter.clearEventsBoard();
+    eventsBoardPresenter.renderEventsBoardMessage({ error });
+  }));

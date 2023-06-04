@@ -2,12 +2,13 @@ import EventPresenter from '../../event/presenter/event-presenter.js';
 import EventsBoardSortView from '../view/events-board-sort-view.js';
 import EventsBoardListView from '../view/events-board-list-view.js';
 import EventsBoardMessageView from '../view/events-board-message-view.js';
+import UiBlocker from '../../../framework/ui-blocker/ui-blocker.js';
 
 import { RenderPosition, remove, render } from '../../../framework/render.js';
 import { sortByDurationDesc, sortByDateFromAsc } from '../../../utils/date.js';
 import { filterEventsBy } from '../../../utils/filters.js';
 import { sortByDesc } from '../../../utils/common.js';
-import { SortType, UpdateType, UserAction } from '../../../const.js';
+import { TimeLimit, SortType, UpdateType, UserAction } from '../../../const.js';
 
 const tripEvents = document.querySelector('.trip-events');
 
@@ -27,7 +28,13 @@ export default class EventsBoardPresenter {
   #defaultSortType = SortType.DAY;
   #currentSortType = this.#defaultSortType;
 
+  #isCreating = false;
   #isLoading = true;
+
+  #UIBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({ destinationsModel, offerTypesModel, eventsModel, filtersModel }) {
     this.#destinationsModel = destinationsModel;
@@ -64,15 +71,19 @@ export default class EventsBoardPresenter {
   }
 
   init({ newEventPresenter }) {
-    this.#renderEventsBoard();
+    this.renderEventsBoard();
     this.#newEventPresenter = newEventPresenter;
+  }
+
+  setIsCreatingFlagValue(value) {
+    this.#isCreating = value;
   }
 
   setDefaultSortType() {
     this.#currentSortType = this.#defaultSortType;
   }
 
-  #renderEventsBoard() {
+  renderEventsBoard() {
     this.#renderEventsBoardList();
 
     if (this.#isLoading) {
@@ -80,7 +91,7 @@ export default class EventsBoardPresenter {
       return;
     }
 
-    if (this.events.length === 0) {
+    if (this.events.length === 0 && !this.#isCreating) {
       this.renderEventsBoardMessage({ currentFilter: this.#filtersModel.currentFilter });
       return;
     }
@@ -88,7 +99,7 @@ export default class EventsBoardPresenter {
     this.#renderEventsBoardSort();
   }
 
-  #clearEventsBoard({ resetSortType = false } = {}) {
+  clearEventsBoard({ resetSortType = false } = {}) {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
@@ -112,7 +123,11 @@ export default class EventsBoardPresenter {
 
   #renderEventsBoardList() {
     render(this.eventsBoardListComponent, tripEvents);
-    this.events.forEach((event) => this.#renderEventsBoardItem({ destinations: this.destinations, offerTypes: this.offerTypes, event }));
+    this.events.forEach((event) => this.#renderEventsBoardItem({
+      destinations: this.destinations,
+      offerTypes: this.offerTypes,
+      event
+    }));
   }
 
   #renderEventsBoardItem({ destinations, offerTypes, event }) {
@@ -126,46 +141,80 @@ export default class EventsBoardPresenter {
     this.#eventPresenters.set(event.id, eventsBoardItemPresenter);
   }
 
-  renderEventsBoardMessage({ message, currentFilter }) {
-    this.#clearEventsBoard();
-    this.#eventsBoardMessageComponent = new EventsBoardMessageView({ message, currentFilter });
+  renderEventsBoardMessage({ message, currentFilter, error = null }) {
+    const messageText = error ? error.message : message;
+    this.#eventsBoardMessageComponent = new EventsBoardMessageView({ message: messageText, currentFilter });
     render(this.#eventsBoardMessageComponent, tripEvents);
   }
 
-  onEventUserAction = (actionType, updateType, updatedEvent) => {
+  onEventUserAction = async (actionType, updateType, updatedEvent) => {
+    this.#UIBlocker.block();
+
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this.#eventsModel.updateEvent(updateType, updatedEvent);
+        this.#eventPresenters
+          .get(updatedEvent.id)
+          .setSaving();
+        try {
+          await this.#eventsModel.updateEvent(updateType, updatedEvent);
+        } catch {
+          this.#eventPresenters
+            .get(updatedEvent.id)
+            .setAborting();
+        }
         break;
       case UserAction.ADD_EVENT:
-        this.#eventsModel.addEvent(updateType, updatedEvent);
+        this.#newEventPresenter.setSaving();
+        try {
+          await this.#eventsModel.addEvent(updateType, updatedEvent);
+          this.#newEventPresenter.activateNewEventButton();
+        } catch {
+          this.#newEventPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_EVENT:
-        this.#eventsModel.deleteEvent(updateType, updatedEvent);
+        this.#eventPresenters
+          .get(updatedEvent.id)
+          .setDeleting();
+        try {
+          await this.#eventsModel.deleteEvent(updateType, updatedEvent);
+        } catch {
+          this.#eventPresenters
+            .get(updatedEvent.id)
+            .setAborting();
+        }
         break;
       default:
         throw new Error(`No implementation of interaction with the model with the type of user action was found ${actionType}`);
     }
+
+    this.#UIBlocker.unblock();
   };
 
   #onModelChange = (updateType, updatedEvent) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#eventPresenters.get(updatedEvent.id).init({ destinations: this.destinations, offerTypes: this.offerTypes, event: updatedEvent });
+        this.#eventPresenters
+          .get(updatedEvent.id)
+          .init({
+            destinations: this.destinations,
+            offerTypes: this.offerTypes,
+            event: updatedEvent
+          });
         break;
       case UpdateType.MINOR:
-        this.#clearEventsBoard();
-        this.#renderEventsBoard();
+        this.clearEventsBoard();
+        this.renderEventsBoard();
         break;
       case UpdateType.MAJOR:
-        this.#clearEventsBoard({ resetSortType: true });
-        this.#renderEventsBoard();
+        this.clearEventsBoard({ resetSortType: true });
+        this.renderEventsBoard();
         break;
       case UpdateType.INIT:
         try {
           this.#isLoading = false;
-          this.#clearEventsBoard();
-          this.#renderEventsBoard();
+          this.clearEventsBoard();
+          this.renderEventsBoard();
           break;
         } catch {
           throw new Error('Critical Web application initialization error!');
@@ -182,7 +231,7 @@ export default class EventsBoardPresenter {
 
   #onSortTypeChange = (sortTypeName) => {
     this.#currentSortType = SortType[sortTypeName];
-    this.#clearEventsBoard();
-    this.#renderEventsBoard();
+    this.clearEventsBoard();
+    this.renderEventsBoard();
   };
 }

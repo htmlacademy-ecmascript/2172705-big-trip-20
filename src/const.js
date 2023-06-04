@@ -1,10 +1,17 @@
 const MAX_DISPLAYED_DESTINATIONS = 3;
-const END_POINT = 'https://20.objects.pages.academy/big-trip';
+const END_POINT = 'https://20.ecmascript.pages.academy/big-trip';
 const ERROR_MESSAGE_SHOW_TIME = 5000;
 
 const HTTPMethod = {
+  POST: 'POST',
   GET: 'GET',
-  PUT: 'PUT'
+  PUT: 'PUT',
+  DELETE: 'DELETE'
+};
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000
 };
 
 const FilterType = {
@@ -62,4 +69,15 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-export { MAX_DISPLAYED_DESTINATIONS, END_POINT, ERROR_MESSAGE_SHOW_TIME, HTTPMethod, SortType, FilterType, EmptyFilterMessage, EventMode, UserAction, UpdateType };
+export {
+  MAX_DISPLAYED_DESTINATIONS,
+  END_POINT, ERROR_MESSAGE_SHOW_TIME,
+  HTTPMethod,
+  TimeLimit,
+  SortType,
+  FilterType,
+  EmptyFilterMessage,
+  EventMode,
+  UserAction,
+  UpdateType
+};

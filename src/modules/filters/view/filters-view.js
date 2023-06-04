@@ -18,15 +18,22 @@ const createFiltersItemTemplate = (type, isChecked, isDisabled) => (/*html*/`
     </label>
   </div>`);
 
+const createFiltersItemsTemplate = (filters, currentFilter) => (/*html*/`
+  ${Object
+    .entries(filters)
+    .map(([type, count]) => createFiltersItemTemplate(type, currentFilter === type, count === 0))
+    .join('')
+  }`);
+
 const createFiltersTemplate = (filters, currentFilter) => (/*html*/`
-    <div class="trip-main__trip-controls  trip-controls">
-      <div class="trip-controls__filters">
-        <h2 class="visually-hidden">Filter events</h2>
-        <form class="trip-filters" action="#" method="get">
-          ${Object.entries(filters).map(([type, count]) => createFiltersItemTemplate(type, currentFilter === type, count === 0)).join('')}
-        </form>
-      </div>
-    </div>`);
+  <div class="trip-main__trip-controls  trip-controls">
+    <div class="trip-controls__filters">
+      <h2 class="visually-hidden">Filter events</h2>
+      <form class="trip-filters" action="#" method="get">
+        ${createFiltersItemsTemplate(filters, currentFilter)}
+      </form>
+    </div>
+  </div>`);
 
 export default class EventsBoardFiltersView extends AbstractView {
   #filters = [];

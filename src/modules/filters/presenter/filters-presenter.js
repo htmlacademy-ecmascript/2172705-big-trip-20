@@ -1,8 +1,8 @@
+import EventsBoardFiltersView from '../view/filters-view.js';
+
 import { render, replace, remove } from '../../../framework/render.js';
 import { generateFilters } from '../../../utils/filters.js';
 import { UpdateType } from '../../../const.js';
-
-import EventsBoardFiltersView from '../view/filters-view.js';
 
 const tripMain = document.querySelector('.trip-main');
 

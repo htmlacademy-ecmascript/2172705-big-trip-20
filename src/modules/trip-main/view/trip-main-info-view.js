@@ -1,4 +1,5 @@
 import AbstractView from '../../../framework/view/abstract-view.js';
+
 import { sortByAsc } from '../../../utils/common.js';
 import { DateFormat, convertDate, isSameDate } from '../../../utils/date.js';
 import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
@@ -6,10 +7,10 @@ import { MAX_DISPLAYED_DESTINATIONS } from '../../../const.js';
 //* Определение наименования маршрута
 //* ------------------------------------------------------
 
-const getDestinationItem = (destinations, eventItem) => destinations.find((item) => item.id === eventItem.destination);
-
 const getTitle = ({ destinations, events }) => {
-  const destinationNamesList = events.map((event) => getDestinationItem(destinations, event).name);
+  const destinationNamesList = events
+    .sort(sortByAsc('dateFrom'))
+    .map((event) => destinations.get(event.destination).name);
 
   if (destinationNamesList.length <= MAX_DISPLAYED_DESTINATIONS) {
     return destinationNamesList.join('&nbsp;&mdash;&nbsp;');
@@ -26,8 +27,13 @@ const getTripDates = ({ events }) => {
     return '';
   }
 
-  const firstEventSortedByDateTo = events.sort(sortByAsc('dateFrom')).at(0);
-  const lastEventSortedByDateTo = events.sort(sortByAsc('dateTo')).at(-1);
+  const firstEventSortedByDateTo = events
+    .sort(sortByAsc('dateFrom'))
+    .at(0);
+  const lastEventSortedByDateTo = events
+    .sort(sortByAsc('dateTo'))
+    .at(-1);
+
   const formattedDateFrom = convertDate(firstEventSortedByDateTo.dateFrom, DateFormat.EVENT_DATE);
   let formattedDateTo = convertDate(lastEventSortedByDateTo.dateTo, DateFormat.EVENT_DATE);
 
@@ -48,16 +54,10 @@ const calculateTotalCost = ({ offerTypes, events }) => {
 
   const totalCost = events.reduce((result, event) => {
     let offersCost = 0;
-    const { offers } = offerTypes.find((type) => type.type === event.type);
+    const { offers } = offerTypes.get(event.type);
 
     if (offers.length !== 0 && event.offers !== 0) {
-      offersCost = offers.reduce((accum, offer) => {
-        if (event.offers.includes(offer.id)) {
-          return accum + offer.price;
-        }
-
-        return accum;
-      }, 0);
+      offersCost = offers.reduce((accum, offer) => event.offers.includes(offer.id) ? accum + offer.price : accum, 0);
     }
 
     return result + event.basePrice + offersCost;
