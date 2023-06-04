@@ -46,17 +46,13 @@ export default class NewEventPresenter {
     this.#newEventFormComponent.shake(resetFormDisabling);
   }
 
-  #createNewEvent() {
-    this.#newEventFormComponent = new EventFormItemView({
-      data: { destinations: this.#destinationsModel.destinations, offerTypes: this.#offerTypesModel.offerTypes, event: this.#createNewEventBlank() },
-      isNewEvent: true,
-      onFormSubmit: this.#onNewEventFormSubmit,
-      onButtonClick: this.#onCancelButtonClick
-    });
+  activateNewEventButton = () => {
+    this.#newEventButtonComponent.element.disabled = false;
+  };
 
-    render(this.#newEventFormComponent, this.#boardPresenter.eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#onDocumentEscapeKeydown);
-  }
+  deactivateNewEventButton = () => {
+    this.#newEventButtonComponent.element.disabled = true;
+  };
 
   closeNewEventForm = () => {
     if (this.#newEventFormComponent === null) {
@@ -70,13 +66,17 @@ export default class NewEventPresenter {
     this.#newEventFormComponent = null;
   };
 
-  activateNewEventButton = () => {
-    this.#newEventButtonComponent.element.disabled = false;
-  };
+  #createNewEvent() {
+    this.#newEventFormComponent = new EventFormItemView({
+      data: { destinations: this.#destinationsModel.destinations, offerTypes: this.#offerTypesModel.offerTypes, event: this.#createNewEventBlank() },
+      isNewEvent: true,
+      onFormSubmit: this.#onNewEventFormSubmit,
+      onButtonClick: this.#onCancelButtonClick
+    });
 
-  deactivateNewEventButton = () => {
-    this.#newEventButtonComponent.element.disabled = true;
-  };
+    render(this.#newEventFormComponent, this.#boardPresenter.eventsBoardListComponent.element, RenderPosition.AFTERBEGIN);
+    document.addEventListener('keydown', this.#onDocumentEscapeKeydown);
+  }
 
   #renderNewEventButton() {
     this.#newEventButtonComponent = new NewEventButtonView({

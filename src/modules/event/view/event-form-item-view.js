@@ -72,7 +72,7 @@ const createEventsEditOffersTemplate = (offerTypeItem, eventSelectedOffers, isDi
 
 const createDestinationListTemplate = ({ destinations, event }) => (/*html*/`
   <datalist id="destination-list-${event.id}">
-    ${Array.from(destinations).map(([, destination]) => `<option value="${destination.name}" data-destination-id="${destination.id}"></option>`).join('')}
+    ${Array.from(destinations.values()).map((destination) => `<option value="${destination.name}" data-destination-id="${destination.id}"></option>`).join('')}
   </datalist>`);
 
 //* Шаблон разметки выбора типа события
@@ -82,17 +82,17 @@ const createEventTypeListTemplate = ({ offerTypes, event }) => (/*html*/`
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${Array.from(offerTypes).map(([, type]) => (/*html*/`
+        ${Array.from(offerTypes.values()).map((offerType) => (/*html*/`
           <div class="event__type-item">
             <input
-              id="event-type-${type.type}-${event.id}"
+              id="event-type-${offerType.type}-${event.id}"
               class="event__type-input  visually-hidden"
               type="radio"
               name="event-type"
-              value="${type.type}"
-              ${event.type === type.type ? 'checked' : ''}
+              value="${offerType.type}"
+              ${event.type === offerType.type ? 'checked' : ''}
             >
-            <label class="event__type-label  event__type-label--${type.type}" for="event-type-${type.type}-${event.id}">${capitalizeWord(type.type)}</label>
+            <label class="event__type-label  event__type-label--${offerType.type}" for="event-type-${offerType.type}-${event.id}">${capitalizeWord(offerType.type)}</label>
           </div>`)).join('')}
       </fieldset>
     </div>`);

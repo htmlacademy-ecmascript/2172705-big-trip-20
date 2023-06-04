@@ -10,6 +10,10 @@ export default class EventsModel extends Observable {
     this.#serverDataApiService = serverDataApiService;
   }
 
+  get events() {
+    return this.#events;
+  }
+
   async init() {
     try {
       this.#events = await this.#serverDataApiService.getEvents();
@@ -18,10 +22,6 @@ export default class EventsModel extends Observable {
     }
 
     this._notify(UpdateType.INIT);
-  }
-
-  get events() {
-    return this.#events;
   }
 
   async addEvent(updateType, event) {

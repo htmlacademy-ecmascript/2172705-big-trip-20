@@ -181,6 +181,7 @@ export default class EventsBoardPresenter {
       case UpdateType.MINOR:
         this.clearEventsBoard();
         this.#renderEventsBoard();
+        this.#newEventPresenter.activateNewEventButton();
         break;
       case UpdateType.MAJOR:
         this.clearEventsBoard({ resetSortType: true });

@@ -69,4 +69,15 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-export { MAX_DISPLAYED_DESTINATIONS, END_POINT, ERROR_MESSAGE_SHOW_TIME, HTTPMethod, TimeLimit, SortType, FilterType, EmptyFilterMessage, EventMode, UserAction, UpdateType };
+export {
+  MAX_DISPLAYED_DESTINATIONS,
+  END_POINT, ERROR_MESSAGE_SHOW_TIME,
+  HTTPMethod,
+  TimeLimit,
+  SortType,
+  FilterType,
+  EmptyFilterMessage,
+  EventMode,
+  UserAction,
+  UpdateType
+};

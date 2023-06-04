@@ -96,16 +96,10 @@ export default class ServerDataApiService extends ApiService {
   }
 
   #adaptServerDestinationsToClient(parsedResponse) {
-    const destinationsMap = new Map();
-    parsedResponse.forEach((item) => destinationsMap.set(item.id, item));
-
-    return destinationsMap;
+    return new Map(parsedResponse.map((item) => [item.id, item]));
   }
 
   #adaptServerOfferTypesToClient(parsedResponse) {
-    const offerTypesMap = new Map();
-    parsedResponse.forEach((item) => offerTypesMap.set(item.type, item));
-
-    return offerTypesMap;
+    return new Map(parsedResponse.map((item) => [item.type, item]));
   }
 }
